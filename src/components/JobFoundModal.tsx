@@ -1,8 +1,15 @@
 "use client";
 
-import React, { useEffect, useMemo, useRef, useState, useCallback } from "react";
+import React, {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  useCallback,
+} from "react";
 import Image from "next/image";
 import OptionButton from "./OptionButton";
+import CancellationFeedbackModal from "./CancellationFeedbackModal";
 
 type Props = {
   visible: boolean;
@@ -14,7 +21,8 @@ export default function JobFoundModal({ visible, onClose, onBack }: Props) {
   // ======= Steps (3 total) =======
   const TOTAL_STEPS = 3;
   const [step, setStep] = useState(1);
-  const goToStep = (n: number) => setStep(Math.min(Math.max(n, 1), TOTAL_STEPS));
+  const goToStep = (n: number) =>
+    setStep(Math.min(Math.max(n, 1), TOTAL_STEPS));
 
   // ======= Form state (Step 1) =======
   const [foundVia, setFoundVia] = useState<string | null>(null);
@@ -69,12 +77,33 @@ export default function JobFoundModal({ visible, onClose, onBack }: Props) {
 
   if (!visible) return null;
 
+  // When the user advances to step 2, render the feedback modal only to avoid
+  // stacking the JobFoundModal UI underneath it (causes the mobile overlap).
+  if (step === 2) {
+    return (
+      <CancellationFeedbackModal
+        visible={true}
+        onBack={() => goToStep(1)}
+        onClose={() => goToStep(3)}
+        onSubmit={(feedback) => {
+          console.log("cancellation feedback:", feedback);
+        }}
+      />
+    );
+  }
+
   const onContinue = () => {
     if (step < TOTAL_STEPS) {
       goToStep(step + 1);
       return;
     }
-    console.log({ step, foundVia, appliedCount, emailedCount, interviewedCount });
+    console.log({
+      step,
+      foundVia,
+      appliedCount,
+      emailedCount,
+      interviewedCount,
+    });
     onClose();
   };
 
@@ -97,7 +126,10 @@ export default function JobFoundModal({ visible, onClose, onBack }: Props) {
           );
         })}
       </div>
-      <span className="text-sm text-gray-600" style={{ fontFamily: "var(--font-dm-sans)" }}>
+      <span
+        className="text-sm text-gray-600"
+        style={{ fontFamily: "var(--font-dm-sans)" }}
+      >
         Step {step} of {TOTAL_STEPS}
       </span>
     </div>
@@ -115,39 +147,69 @@ export default function JobFoundModal({ visible, onClose, onBack }: Props) {
 
       <div className="mt-6 space-y-6">
         <div>
-          <p className="text-[15px] text-gray-700 mb-2" style={{ fontFamily: "var(--font-dm-sans)" }}>
+          <p
+            className="text-[15px] text-gray-700 mb-2"
+            style={{ fontFamily: "var(--font-dm-sans)" }}
+          >
             Did you find this job with MigrateMate?*
           </p>
           <div className="grid grid-cols-2 gap-4">
-            <OptionButton label="Yes" active={foundVia === "yes"} onClick={() => setFoundVia("yes")} />
-            <OptionButton label="No" active={foundVia === "no"} onClick={() => setFoundVia("no")} />
+            <OptionButton
+              label="Yes"
+              active={foundVia === "yes"}
+              onClick={() => setFoundVia("yes")}
+            />
+            <OptionButton
+              label="No"
+              active={foundVia === "no"}
+              onClick={() => setFoundVia("no")}
+            />
           </div>
         </div>
 
         <div>
-          <p className="text-[15px] text-gray-700 mb-2" style={{ fontFamily: "var(--font-dm-sans)" }}>
+          <p
+            className="text-[15px] text-gray-700 mb-2"
+            style={{ fontFamily: "var(--font-dm-sans)" }}
+          >
             How many roles did you <u>apply</u> for through Migrate Mate?*
           </p>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             {["0", "1–5", "6–20", "20+"].map((val) => (
-              <OptionButton key={val} label={val} active={appliedCount === val} onClick={() => setAppliedCount(val)} />
+              <OptionButton
+                key={val}
+                label={val}
+                active={appliedCount === val}
+                onClick={() => setAppliedCount(val)}
+              />
             ))}
           </div>
         </div>
 
         <div>
-          <p className="text-[15px] text-gray-700 mb-2" style={{ fontFamily: "var(--font-dm-sans)" }}>
+          <p
+            className="text-[15px] text-gray-700 mb-2"
+            style={{ fontFamily: "var(--font-dm-sans)" }}
+          >
             How many companies did you <u>email</u> directly?*
           </p>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             {["0", "1–5", "6–20", "20+"].map((val) => (
-              <OptionButton key={val} label={val} active={emailedCount === val} onClick={() => setEmailedCount(val)} />
+              <OptionButton
+                key={val}
+                label={val}
+                active={emailedCount === val}
+                onClick={() => setEmailedCount(val)}
+              />
             ))}
           </div>
         </div>
 
         <div>
-          <p className="text-[15px] text-gray-700 mb-2" style={{ fontFamily: "var(--font-dm-sans)" }}>
+          <p
+            className="text-[15px] text-gray-700 mb-2"
+            style={{ fontFamily: "var(--font-dm-sans)" }}
+          >
             How many different companies did you <u>interview</u> with?*
           </p>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -164,6 +226,21 @@ export default function JobFoundModal({ visible, onClose, onBack }: Props) {
       </div>
 
       <div className="h-4" />
+      {/* Divider + Continue (desktop) */}
+      <hr className="hidden lg:block mt-6 mb-4 border-gray-200" />
+      <button
+        onClick={onContinue}
+        disabled={!foundVia}
+        className={[
+          "hidden lg:block w-full py-3.5 rounded-2xl font-semibold transition-colors",
+          foundVia
+            ? "bg-[#5D3AF7] text-white hover:bg-[#4F2FF3]"
+            : "bg-gray-100 text-gray-400 cursor-not-allowed",
+        ].join(" ")}
+        style={{ fontFamily: "var(--font-dm-sans)" }}
+      >
+        Continue
+      </button>
     </>
   );
 
@@ -176,7 +253,10 @@ export default function JobFoundModal({ visible, onClose, onBack }: Props) {
   const onDragMove = (clientY: number) => {
     if (startYRef.current == null) return;
     const dy = clientY - startYRef.current;
-    const next = Math.max(0, Math.min(startTranslateRef.current + dy, snaps.CLOSED));
+    const next = Math.max(
+      0,
+      Math.min(startTranslateRef.current + dy, snaps.CLOSED)
+    );
     setTranslateY(next);
   };
   const onDragEnd = () => {
@@ -187,11 +267,16 @@ export default function JobFoundModal({ visible, onClose, onBack }: Props) {
       onClose();
       return;
     }
-    const target = Math.abs(translateY - snaps.FULL) < Math.abs(translateY - snaps.MID) ? snaps.FULL : snaps.MID;
+    const target =
+      Math.abs(translateY - snaps.FULL) < Math.abs(translateY - snaps.MID)
+        ? snaps.FULL
+        : snaps.MID;
     setTranslateY(target);
   };
-  const handleTouchStart = (e: React.TouchEvent) => onDragStart(e.touches[0].clientY);
-  const handleTouchMove = (e: React.TouchEvent) => onDragMove(e.touches[0].clientY);
+  const handleTouchStart = (e: React.TouchEvent) =>
+    onDragStart(e.touches[0].clientY);
+  const handleTouchMove = (e: React.TouchEvent) =>
+    onDragMove(e.touches[0].clientY);
   const handleTouchEnd = () => onDragEnd();
   const handleMouseDown = (e: React.MouseEvent) => {
     onDragStart(e.clientY);
@@ -225,10 +310,23 @@ export default function JobFoundModal({ visible, onClose, onBack }: Props) {
             className="flex items-center gap-2 text-gray-700 hover:text-gray-900"
             aria-label="Back"
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M15 19l-7-7 7-7"
+              />
             </svg>
-            <span className="text-sm" style={{ fontFamily: "var(--font-dm-sans)" }}>
+            <span
+              className="text-sm"
+              style={{ fontFamily: "var(--font-dm-sans)" }}
+            >
               Back
             </span>
           </button>
@@ -244,9 +342,23 @@ export default function JobFoundModal({ visible, onClose, onBack }: Props) {
             <Stepper />
           </div>
 
-          <button onClick={onClose} className="p-1.5 text-gray-400 hover:text-gray-600" aria-label="Close">
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          <button
+            onClick={onClose}
+            className="p-1.5 text-gray-400 hover:text-gray-600"
+            aria-label="Close"
+          >
+            <svg
+              className="w-6 h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M6 18L18 6M6 6l12 12"
+              />
             </svg>
           </button>
         </div>
@@ -276,7 +388,9 @@ export default function JobFoundModal({ visible, onClose, onBack }: Props) {
         className="lg:hidden fixed inset-x-0 bottom-0 z-[60]"
         style={{
           transform: `translateY(${translateY}px)`,
-          transition: dragging ? "none" : "transform 220ms cubic-bezier(.2,.8,.2,1)",
+          transition: dragging
+            ? "none"
+            : "transform 220ms cubic-bezier(.2,.8,.2,1)",
         }}
         onClick={(e) => e.stopPropagation()} // prevent overlay close when tapping sheet
       >
@@ -303,8 +417,18 @@ export default function JobFoundModal({ visible, onClose, onBack }: Props) {
                 className="absolute right-4 top-4 text-gray-400 hover:text-gray-600"
                 aria-label="Close"
               >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                <svg
+                  className="w-6 h-6"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
                 </svg>
               </button>
             </div>
@@ -327,7 +451,10 @@ export default function JobFoundModal({ visible, onClose, onBack }: Props) {
                   );
                 })}
               </div>
-              <span className="text-sm text-gray-600" style={{ fontFamily: "var(--font-dm-sans)" }}>
+              <span
+                className="text-sm text-gray-600"
+                style={{ fontFamily: "var(--font-dm-sans)" }}
+              >
                 Step {step} of {TOTAL_STEPS}
               </span>
             </div>
@@ -340,10 +467,23 @@ export default function JobFoundModal({ visible, onClose, onBack }: Props) {
               className="flex items-center gap-2 text-gray-700 hover:text-gray-900"
               aria-label="Back"
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M15 19l-7-7 7-7"
+                />
               </svg>
-              <span className="text-sm" style={{ fontFamily: "var(--font-dm-sans)" }}>
+              <span
+                className="text-sm"
+                style={{ fontFamily: "var(--font-dm-sans)" }}
+              >
                 Back
               </span>
             </button>
@@ -360,7 +500,9 @@ export default function JobFoundModal({ visible, onClose, onBack }: Props) {
           {/* Sticky bottom action bar */}
           <div
             className="absolute inset-x-0 bottom-0 bg-white border-t border-gray-200 px-4 pb-4 pt-3"
-            style={{ paddingBottom: "calc(env(safe-area-inset-bottom) + 16px)" }}
+            style={{
+              paddingBottom: "calc(env(safe-area-inset-bottom) + 16px)",
+            }}
           >
             <button
               onClick={onContinue}
