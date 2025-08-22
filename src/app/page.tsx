@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import CancellationModal from "../components/CancellationModal";
+import JobFoundModal from "../components/JobFoundModal";
 // Mock user data for UI display
 const mockUser = {
   email: "user@example.com",
@@ -54,10 +55,13 @@ export default function ProfilePage() {
     setShowCancellationModal(false);
   };
 
-  const handleJobFound = () => {
-    console.log("User found a job");
+  // removed: now handled by openJobFoundModal
+
+  const [showJobFoundModal, setShowJobFoundModal] = useState(false);
+
+  const openJobFoundModal = () => {
     setShowCancellationModal(false);
-    // Add navigation logic here
+    setShowJobFoundModal(true);
   };
 
   const handleStillLooking = () => {
@@ -417,8 +421,16 @@ export default function ProfilePage() {
       <CancellationModal
         visible={showCancellationModal}
         onClose={handleCloseModal}
-        onJobFound={handleJobFound}
+        onJobFound={openJobFoundModal}
         onStillLooking={handleStillLooking}
+      />
+      <JobFoundModal
+        visible={showJobFoundModal}
+        onClose={() => setShowJobFoundModal(false)}
+        onBack={() => {
+          setShowJobFoundModal(false);
+          setShowCancellationModal(true);
+        }}
       />
     </div>
   );
