@@ -3,6 +3,7 @@
 import { useState } from "react";
 import CancellationModal from "../components/CancellationModal";
 import JobFoundModal from "../components/JobFoundModal";
+import JobSearchModal from "../components/JobSearchModal";
 // Mock user data for UI display
 const mockUser = {
   email: "user@example.com",
@@ -58,6 +59,7 @@ export default function ProfilePage() {
   // removed: now handled by openJobFoundModal
 
   const [showJobFoundModal, setShowJobFoundModal] = useState(false);
+  const [showJobSearchModal, setShowJobSearchModal] = useState(false);
 
   const openJobFoundModal = () => {
     setShowCancellationModal(false);
@@ -66,8 +68,9 @@ export default function ProfilePage() {
 
   const handleStillLooking = () => {
     console.log("User is still looking for a job");
+    // Close the cancellation modal and open the Job Search downsell modal
     setShowCancellationModal(false);
-    // Add navigation logic here
+    setShowJobSearchModal(true);
   };
 
   if (loading) {
@@ -423,6 +426,22 @@ export default function ProfilePage() {
         onClose={handleCloseModal}
         onJobFound={openJobFoundModal}
         onStillLooking={handleStillLooking}
+      />
+      <JobSearchModal
+        visible={showJobSearchModal}
+        onClose={() => setShowJobSearchModal(false)}
+        onBack={() => {
+          setShowJobSearchModal(false);
+          setShowCancellationModal(true);
+        }}
+        onAccept={() => {
+          console.log("User accepted downsell offer");
+          setShowJobSearchModal(false);
+        }}
+        onDecline={() => {
+          console.log("User declined downsell offer");
+          setShowJobSearchModal(false);
+        }}
       />
       <JobFoundModal
         visible={showJobFoundModal}
