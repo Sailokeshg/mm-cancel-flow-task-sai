@@ -38,8 +38,13 @@ export default function JobSearchModal({
     interviewedCount: string;
   }) => {
     console.log("Survey feedback:", feedback);
+    // Don't close the survey modal immediately, let it handle the next step
+  };
+
+  const handleNextStep = (reason: string) => {
+    console.log("Cancellation reason:", reason);
     setShowSurveyModal(false);
-    onDecline(); // Call the original onDecline
+    onDecline(); // Call the original onDecline after the full flow
   };
 
   const handleAcceptOffer = () => {
@@ -69,6 +74,7 @@ export default function JobSearchModal({
         onClose={() => setShowSurveyModal(false)}
         onBack={handleSurveyBack}
         onSubmit={handleSurveySubmit}
+        onNextStep={handleNextStep}
         onAcceptOffer={handleAcceptOffer}
         onOfferModalShow={handleOfferModalShow}
         onOfferModalClose={handleOfferModalClose}
@@ -325,6 +331,7 @@ export default function JobSearchModal({
         onClose={() => setShowSurveyModal(false)}
         onBack={handleSurveyBack}
         onSubmit={handleSurveySubmit}
+        onNextStep={handleNextStep}
         onAcceptOffer={handleAcceptOffer}
         onOfferModalShow={handleOfferModalShow}
         onOfferModalClose={handleOfferModalClose}
