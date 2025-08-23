@@ -6,6 +6,8 @@ import useMediaQuery from "@mui/material/useMediaQuery";
 import OptionButton from "./OptionButton";
 import CancellationFeedbackModal from "./CancellationFeedbackModal";
 import CancellationVisaSupportModal from "./CancellationVisaSupportModel";
+import CancellationProcessedModal from "./CancellationProcessedModal";
+import CancellationCompletionModal from "./CancellationCompletionModal";
 import ResponsiveDialog from "./ResponsiveDialog";
 import MUIDrawer from "./MUIDrawer";
 
@@ -24,6 +26,10 @@ export default function JobFoundModal({ visible, onClose, onBack }: Props) {
   const [step, setStep] = useState(1);
   const [foundVia, setFoundVia] = useState<string | null>(null);
 
+  // ======= Completion flow state =======
+  const [showProcessedModal, setShowProcessedModal] = useState(false);
+  const [showCompletionModal, setShowCompletionModal] = useState(false);
+
   const goToStep = (n: number) =>
     setStep(Math.min(Math.max(n, 1), TOTAL_STEPS));
 
@@ -40,6 +46,8 @@ export default function JobFoundModal({ visible, onClose, onBack }: Props) {
       setAppliedCount(null);
       setEmailedCount(null);
       setInterviewedCount(null);
+      setShowProcessedModal(false);
+      setShowCompletionModal(false);
     }
   }, [visible]);
 
@@ -64,14 +72,61 @@ export default function JobFoundModal({ visible, onClose, onBack }: Props) {
     );
   }
 
+  // Show completion modals after visa support step
+  if (showProcessedModal) {
+    return (
+      <CancellationProcessedModal
+        visible
+        onClose={() => {
+          // Reset all states before closing
+          setShowProcessedModal(false);
+          setShowCompletionModal(false);
+          setStep(1);
+          setFoundVia(null);
+          setAppliedCount(null);
+          setEmailedCount(null);
+          setInterviewedCount(null);
+          onClose();
+        }}
+        totalSteps={TOTAL_STEPS}
+      />
+    );
+  }
+
+  if (showCompletionModal) {
+    return (
+      <CancellationCompletionModal
+        visible
+        onClose={() => {
+          // Reset all states before closing
+          setShowProcessedModal(false);
+          setShowCompletionModal(false);
+          setStep(1);
+          setFoundVia(null);
+          setAppliedCount(null);
+          setEmailedCount(null);
+          setInterviewedCount(null);
+          onClose();
+        }}
+        totalSteps={TOTAL_STEPS}
+      />
+    );
+  }
+
   if (step === 3) {
     return (
       <CancellationVisaSupportModal
         visible
         onBack={() => goToStep(2)}
         onClose={onClose}
-        onComplete={() => {
-          onClose();
+        onComplete={(companyProvidesLawyer: boolean) => {
+          // If company provides lawyer (Yes), show processed modal
+          // If company doesn't provide lawyer (No), show completion modal
+          if (companyProvidesLawyer) {
+            setShowProcessedModal(true);
+          } else {
+            setShowCompletionModal(true);
+          }
         }}
         foundViaYes={foundVia === "yes"}
         totalSteps={TOTAL_STEPS}
@@ -250,10 +305,23 @@ export default function JobFoundModal({ visible, onClose, onBack }: Props) {
                 className="flex items-center gap-2 text-gray-700 hover:text-gray-900"
                 aria-label="Back"
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M15 19l-7-7 7-7"
+                  />
                 </svg>
-                <span className="text-sm" style={{ fontFamily: "var(--font-dm-sans)" }}>
+                <span
+                  className="text-sm"
+                  style={{ fontFamily: "var(--font-dm-sans)" }}
+                >
                   Back
                 </span>
               </button>
@@ -273,8 +341,18 @@ export default function JobFoundModal({ visible, onClose, onBack }: Props) {
                 className="p-1.5 text-gray-400 hover:text-gray-600"
                 aria-label="Close"
               >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                <svg
+                  className="w-6 h-6"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
                 </svg>
               </button>
             </div>

@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import Image from "next/image";
+import useMediaQuery from "@mui/material/useMediaQuery";
 import ResponsiveDialog from "./ResponsiveDialog";
 import MUIDrawer from "./MUIDrawer";
 
@@ -20,6 +21,9 @@ export default function CancellationFeedbackModal({
   onSubmit,
   totalSteps = 3,
 }: Props) {
+  // Desktop breakpoint aligned with Tailwind `lg`
+  const isDesktop = useMediaQuery("(min-width:1024px)");
+
   // ---- This screen is Step 2 of 3 ----
   const STEP_INDEX = 2;
 
@@ -36,16 +40,14 @@ export default function CancellationFeedbackModal({
     if (!isValid) return;
     if (onSubmit) {
       onSubmit(feedback.trim());
-      // Don't call onClose() when onSubmit is provided - let the parent handle the flow
     } else {
-      console.log("Feedback:", feedback.trim());
       onClose();
     }
   };
 
-  // ======= Stepper UI  =======
+  // ======= Stepper UI (left‑aligned) =======
   const Stepper = () => (
-    <div className="flex items-center gap-3">
+    <div className="flex items-center justify-start gap-3">
       <div className="flex items-center gap-2">
         {Array.from({ length: totalSteps }).map((_, i) => {
           const idx = i + 1;
@@ -71,7 +73,7 @@ export default function CancellationFeedbackModal({
     </div>
   );
 
-  // ==== Shared left content (desktop body; mobile drawer body) ====
+  // ==== Shared left content (desktop body) ====
   const LeftContent = () => (
     <div className="max-w-[760px]">
       <h1
@@ -108,7 +110,7 @@ export default function CancellationFeedbackModal({
         </div>
       </div>
 
-      {/* Divider + Continue (desktop) */}
+      {/* Desktop divider + Continue */}
       <hr className="hidden md:block mt-6 mb-4 border-gray-200" />
       <button
         onClick={handleContinue}
@@ -128,8 +130,8 @@ export default function CancellationFeedbackModal({
 
   return (
     <>
-      {/* ===== Desktop modal (MUI) ===== */}
-      <div className="hidden lg:block">
+      {/* ===== Desktop dialog (renders ONLY on desktop) ===== */}
+      {isDesktop && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/30"
           role="dialog"
@@ -143,7 +145,7 @@ export default function CancellationFeedbackModal({
             open={visible}
             onClose={onClose}
             maxWidth="lg"
-            fullWidth={true}
+            fullWidth
             paperSx={{ borderRadius: 6 }}
           >
             <div className="relative">
@@ -210,6 +212,7 @@ export default function CancellationFeedbackModal({
                 <div className="max-w-[1000px]">
                   <LeftContent />
                 </div>
+
                 <div className="flex items-start justify-center">
                   <div className="relative w-full h-[480px] md:h-[560px] rounded-3xl overflow-hidden shadow-md border border-gray-200">
                     <Image
@@ -226,67 +229,74 @@ export default function CancellationFeedbackModal({
             </div>
           </ResponsiveDialog>
         </div>
-      </div>
+      )}
 
-      {/* ===== Mobile drawer ===== */}
-      <MUIDrawer
-        open={visible}
-        onClose={onClose}
-        title="Subscription Cancellation"
-        showGrabHandle={false}
-        headerContent={<Stepper />}
-        backButton={{
-          onBack: onBack ? onBack : onClose,
-          label: "Back",
-        }}
-        stickyFooter={
-          <button
-            onClick={handleContinue}
-            disabled={!isValid}
-            className={[
-              "w-full py-3.5 rounded-2xl font-semibold transition-colors",
-              isValid
-                ? "bg-[#5D3AF7] text-white hover:bg-[#4F2FF3]"
-                : "bg-gray-100 text-gray-400 cursor-not-allowed",
-            ].join(" ")}
-            style={{ fontFamily: "var(--font-dm-sans)" }}
-          >
-            Continue
-          </button>
-        }
-      >
-        <h1
-          className="text-[28px] font-semibold text-gray-800 leading-tight"
-          style={{ fontFamily: "var(--font-dm-sans)" }}
-        >
-          What&apos;s one thing you wish we could&apos;ve helped you with?
-        </h1>
-
-        <p
-          className="mt-4 text-[16px] text-gray-600"
-          style={{ fontFamily: "var(--font-dm-sans)" }}
-        >
-          We&apos;re always looking to improve, your thoughts can help us make
-          Migrate Mate more useful for others.*
-        </p>
-
-        <div className="mt-5">
-          <div className="relative">
-            <textarea
-              value={feedback}
-              onChange={(e) => setFeedback(e.target.value)}
-              className="w-full h-48 rounded-2xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-300 p-4 text-gray-800"
-              style={{ fontFamily: "var(--font-dm-sans)" }}
-            />
-            <div
-              className="absolute bottom-2 right-3 text-sm text-gray-500"
+      {/* ===== Mobile drawer (renders on mobile/tablet) ===== */}
+      {!isDesktop && (
+        <MUIDrawer
+          open={visible}
+          onClose={onClose}
+          title="Subscription Cancellation"
+          showGrabHandle={false}
+          headerContent={<Stepper />}
+          backButton={{
+            onBack: onBack ? onBack : onClose,
+            label: "Back",
+          }}
+          maxHeight="min(75dvh,75vh)"
+          stickyFooter={
+            <button
+              onClick={handleContinue}
+              disabled={!isValid}
+              className={[
+                "w-full h-[56px] rounded-2xl font-semibold transition-colors",
+                isValid
+                  ? "bg-[#5D3AF7] text-white hover:bg-[#4F2FF3]"
+                  : "bg-gray-100 text-gray-400 cursor-not-allowed",
+              ].join(" ")}
               style={{ fontFamily: "var(--font-dm-sans)" }}
             >
-              Min {MIN} characters ({charCount}/{MIN})
+              Continue
+            </button>
+          }
+        >
+          {/* Mobile body — matches Figma */}
+          <h1
+            className="text-[28px] font-semibold text-gray-800 leading-tight"
+            style={{ fontFamily: "var(--font-dm-sans)" }}
+          >
+            What&apos;s one thing you wish we could&apos;ve helped you with?
+          </h1>
+
+          {/* subtle divider under headline */}
+          <div className="mt-3 mb-4 h-px bg-gray-200" />
+
+          <p
+            className="text-[16px] text-gray-600"
+            style={{ fontFamily: "var(--font-dm-sans)" }}
+          >
+            We&apos;re always looking to improve, your thoughts can help us make
+            Migrate Mate more useful for others.*
+          </p>
+
+          <div className="mt-5">
+            <div className="relative">
+              <textarea
+                value={feedback}
+                onChange={(e) => setFeedback(e.target.value)}
+                className="w-full h-48 rounded-2xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-300 p-4 text-gray-800"
+                style={{ fontFamily: "var(--font-dm-sans)" }}
+              />
+              <div
+                className="absolute bottom-2 right-3 text-sm text-gray-500"
+                style={{ fontFamily: "var(--font-dm-sans)" }}
+              >
+                Min {MIN} characters ({charCount}/{MIN})
+              </div>
             </div>
           </div>
-        </div>
-      </MUIDrawer>
+        </MUIDrawer>
+      )}
     </>
   );
 }

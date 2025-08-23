@@ -4,7 +4,6 @@ import { useState } from "react";
 import CancellationModal from "../components/CancellationModal";
 import JobFoundModal from "../components/JobFoundModal";
 import JobSearchModal from "../components/JobSearchModal";
-import CancellationCompletionModal from "../components/CancellationCompletionModal";
 import SubscriptionOfferModal from "../components/SubscriptionOfferModal";
 // Mock user data for UI display
 const mockUser = {
@@ -62,7 +61,6 @@ export default function ProfilePage() {
 
   const [showJobFoundModal, setShowJobFoundModal] = useState(false);
   const [showJobSearchModal, setShowJobSearchModal] = useState(false);
-  const [showCompletionModal, setShowCompletionModal] = useState(false);
   const [showSubscriptionOfferModal, setShowSubscriptionOfferModal] =
     useState(false);
 
@@ -73,12 +71,6 @@ export default function ProfilePage() {
 
   const handleJobFoundModalClose = () => {
     setShowJobFoundModal(false);
-    // Show completion modal after the 3-step flow is complete
-    setShowCompletionModal(true);
-  };
-
-  const handleCompletionModalClose = () => {
-    setShowCompletionModal(false);
   };
 
   const handleStillLooking = () => {
@@ -468,11 +460,14 @@ export default function ProfilePage() {
         }}
       />
 
+      {/* CancellationCompletionModal is now handled internally within JobFoundModal */}
+      {/* 
       <CancellationCompletionModal
         visible={showCompletionModal}
         onClose={handleCompletionModalClose}
         totalSteps={3}
       />
+      */}
 
       <SubscriptionOfferModal
         visible={showSubscriptionOfferModal}

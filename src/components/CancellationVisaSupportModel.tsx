@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import Image from "next/image";
+import useMediaQuery from "@mui/material/useMediaQuery";
 import ResponsiveDialog from "./ResponsiveDialog";
 import MUIDrawer from "./MUIDrawer";
 
@@ -20,12 +21,14 @@ export default function CancellationVisaSupportModal({
   onBack,
   onComplete,
   totalSteps = 3,
-  foundViaYes = true, // default to true for backward compatibility
+  foundViaYes = true,
 }: Props) {
+  const isDesktop = useMediaQuery("(min-width:1024px)");
+
   // ---- This screen is Step 3 of 3 ----
   const STEP_INDEX = 3;
 
-  // Selection state: null until user picks Yes or No
+  // Selection state
   const [answer, setAnswer] = useState<boolean | null>(null);
   const [visaType, setVisaType] = useState<string>("");
   const isValid = answer !== null && visaType.trim().length > 0;
@@ -39,11 +42,11 @@ export default function CancellationVisaSupportModal({
 
   // ======= Stepper UI (greens for progress like Figma) =======
   const Stepper = () => (
-    <div className="flex items-center gap-3">
+    <div className="flex items-center justify-start gap-3">
       <div className="flex items-center gap-2">
         {Array.from({ length: totalSteps }).map((_, i) => {
           const idx = i + 1;
-          const isDone = idx < STEP_INDEX; // Only completed steps are green
+          const isDone = idx < STEP_INDEX;
           const isCurrent = idx === STEP_INDEX;
           return (
             <span
@@ -66,43 +69,30 @@ export default function CancellationVisaSupportModal({
     </div>
   );
 
-  // ==== Shared left content (desktop body; mobile drawer body) ====
+  // ==== Left/main content (desktop body) ====
   const LeftContent = () => (
     <div className="max-w-[760px]">
       <h1
         className="text-4xl md:text-4xl font-semibold text-gray-800 leading-tight"
         style={{ fontFamily: "var(--font-dm-sans)" }}
       >
-        {foundViaYes ? (
-          "We helped you land the job, now let's help you secure your visa."
-        ) : (
-          <>
-            You landed the job!
-            <br />
-            <em>That&apos;s what we live for.</em>
-          </>
-        )}
+        {foundViaYes
+          ? "We helped you land the job, now let’s help you secure your visa."
+          : "You landed the job! That’s what we live for."}
       </h1>
 
-      <p
-        className="text-gray-600 text-base md:text-[17px] leading-relaxed mt-4"
-        style={{ fontFamily: "var(--font-dm-sans)" }}
-      >
-        {foundViaYes
-          ? "Is your company providing an immigration lawyer to help with your visa?"
-          : "Even if it wasn't through Migrate Mate, let us help get your visa sorted."}
-      </p>
+      {/* one subtle divider per Figma */}
+      <div className="mt-3 mb-4 h-px bg-gray-200" />
 
-      {/* Question text - always the same */}
       <p
-        className="text-gray-600 text-base md:text-[17px] leading-relaxed mt-4"
+        className="text-gray-700 text-base md:text-[17px] leading-relaxed"
         style={{ fontFamily: "var(--font-dm-sans)" }}
       >
-        Is your company providing an immigration lawyer to help with your visa?
+        Is your company providing an immigration lawyer to help with your visa?*
       </p>
 
       {/* Radio group */}
-      <fieldset className="mt-6">
+      <fieldset className="mt-4">
         <legend className="sr-only">Company provided immigration lawyer</legend>
         <div className="space-y-4">
           {answer !== false && (
@@ -149,20 +139,19 @@ export default function CancellationVisaSupportModal({
             We can connect you with one of our trusted partners.
           </p>
           <label
-            htmlFor="visa-type"
+            htmlFor="visa-type-no"
             className="block text-[16px] text-gray-800 mb-2"
             style={{ fontFamily: "var(--font-dm-sans)" }}
           >
             Which visa would you like to apply for?*
           </label>
           <input
-            id="visa-type"
+            id="visa-type-no"
             type="text"
             value={visaType}
             onChange={(e) => setVisaType(e.target.value)}
             className="w-full max-w-[560px] px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#5D3AF7] focus:border-transparent"
             style={{ fontFamily: "var(--font-dm-sans)" }}
-            placeholder=""
           />
         </div>
       )}
@@ -184,7 +173,6 @@ export default function CancellationVisaSupportModal({
             onChange={(e) => setVisaType(e.target.value)}
             className="w-full max-w-[560px] px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#5D3AF7] focus:border-transparent"
             style={{ fontFamily: "var(--font-dm-sans)" }}
-            placeholder=""
           />
         </div>
       )}
@@ -209,8 +197,8 @@ export default function CancellationVisaSupportModal({
 
   return (
     <>
-      {/* ===== Desktop modal (MUI) ===== */}
-      <div className="hidden lg:block">
+      {/* ===== Desktop dialog (renders ONLY on desktop) ===== */}
+      {isDesktop && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/30"
           role="dialog"
@@ -224,7 +212,7 @@ export default function CancellationVisaSupportModal({
             open={visible}
             onClose={onClose}
             maxWidth="lg"
-            fullWidth={true}
+            fullWidth
             paperSx={{ borderRadius: 6 }}
           >
             <div className="relative">
@@ -311,139 +299,143 @@ export default function CancellationVisaSupportModal({
             </div>
           </ResponsiveDialog>
         </div>
-      </div>
+      )}
 
-      {/* ===== Mobile drawer ===== */}
-      <MUIDrawer
-        open={visible}
-        onClose={onClose}
-        title="Subscription Cancellation"
-        showGrabHandle={false}
-        headerContent={<Stepper />}
-        backButton={{
-          onBack: onBack ? onBack : onClose,
-          label: "Back",
-        }}
-        stickyFooter={
-          <button
-            onClick={handleComplete}
-            disabled={!isValid}
-            className={[
-              "w-full py-3.5 rounded-2xl font-semibold transition-colors",
-              isValid
-                ? "bg-[#5D3AF7] text-white hover:bg-[#4F2FF3]"
-                : "bg-gray-100 text-gray-400 cursor-not-allowed",
-            ].join(" ")}
+      {/* ===== Mobile drawer (renders on mobile/tablet) ===== */}
+      {/* ===== Mobile drawer (renders on mobile/tablet) ===== */}
+      {!isDesktop && (
+        <MUIDrawer
+          open={visible}
+          onClose={onClose}
+          title="Subscription Cancellation"
+          showGrabHandle={false}
+          headerContent={<Stepper />}
+          backButton={{ onBack: onBack ? onBack : onClose, label: "Back" }}
+          maxHeight="min(75dvh,75vh)"
+          stickyFooter={
+            <button
+              onClick={handleComplete}
+              disabled={!isValid}
+              className={[
+                "w-full h-[56px] rounded-2xl font-semibold transition-colors",
+                isValid
+                  ? "bg-[#5D3AF7] text-white hover:bg-[#4F2FF3]"
+                  : "bg-gray-100 text-gray-400 cursor-not-allowed",
+              ].join(" ")}
+              style={{ fontFamily: "var(--font-dm-sans)" }}
+            >
+              Complete cancellation
+            </button>
+          }
+        >
+          {/* Heading now matches desktop logic */}
+          <h1
+            className="text-[28px] font-semibold text-gray-800 leading-tight"
             style={{ fontFamily: "var(--font-dm-sans)" }}
           >
-            Complete cancellation
-          </button>
-        }
-      >
-        <h1
-          className="text-[28px] font-semibold text-gray-800 leading-tight"
-          style={{ fontFamily: "var(--font-dm-sans)" }}
-        >
-          We helped you land the job, now let&apos;s help you secure your visa.
-        </h1>
+            {foundViaYes
+              ? "We helped you land the job, now let’s help you secure your visa."
+              : "You landed the job! That’s what we live for."}
+          </h1>
 
-        <p
-          className="mt-4 text-[16px] text-gray-700"
-          style={{ fontFamily: "var(--font-dm-sans)" }}
-        >
-          Is your company providing an immigration lawyer to help with your
-          visa?
-        </p>
+          {/* divider */}
+          <div className="mt-3 mb-4 h-px bg-gray-200" />
 
-        <fieldset className="mt-4">
-          <legend className="sr-only">
-            Company provided immigration lawyer
-          </legend>
-          <div className="space-y-4">
-            {answer !== false && (
-              <label
-                className="flex items-center gap-3 cursor-pointer"
+          <p
+            className="text-[16px] text-gray-700"
+            style={{ fontFamily: "var(--font-dm-sans)" }}
+          >
+            Is your company providing an immigration lawyer to help with your
+            visa?*
+          </p>
+
+          <fieldset className="mt-4">
+            <legend className="sr-only">
+              Company provided immigration lawyer
+            </legend>
+            <div className="space-y-4">
+              {answer !== false && (
+                <label
+                  className="flex items-center gap-3 cursor-pointer"
+                  style={{ fontFamily: "var(--font-dm-sans)" }}
+                >
+                  <input
+                    type="radio"
+                    name="visa-lawyer-mobile"
+                    className="h-5 w-5 rounded-full border-gray-300 text-gray-900 focus:ring-gray-300"
+                    checked={answer === true}
+                    onChange={() => setAnswer(true)}
+                  />
+                  <span className="text-[16px] text-gray-800">Yes</span>
+                </label>
+              )}
+
+              {answer !== true && (
+                <label
+                  className="flex items-center gap-3 cursor-pointer"
+                  style={{ fontFamily: "var(--font-dm-sans)" }}
+                >
+                  <input
+                    type="radio"
+                    name="visa-lawyer-mobile"
+                    className="h-5 w-5 rounded-full border-gray-300 text-gray-900 focus:ring-gray-300"
+                    checked={answer === false}
+                    onChange={() => setAnswer(false)}
+                  />
+                  <span className="text-[16px] text-gray-800">No</span>
+                </label>
+              )}
+            </div>
+          </fieldset>
+
+          {/* Visa input depending on selection */}
+          {answer === false && (
+            <div className="mt-4">
+              <p
+                className="text-[16px] text-gray-700 mb-4"
                 style={{ fontFamily: "var(--font-dm-sans)" }}
               >
-                <input
-                  type="radio"
-                  name="visa-lawyer-mobile"
-                  className="h-5 w-5 rounded-full border-gray-300 text-gray-900 focus:ring-gray-300"
-                  checked={answer === true}
-                  onChange={() => setAnswer(true)}
-                />
-                <span className="text-[16px] text-gray-800">Yes</span>
-              </label>
-            )}
-
-            {answer !== true && (
+                We can connect you with one of our trusted partners.
+              </p>
               <label
-                className="flex items-center gap-3 cursor-pointer"
+                htmlFor="visa-type-mobile-no"
+                className="block text-[16px] text-gray-800 mb-2"
                 style={{ fontFamily: "var(--font-dm-sans)" }}
               >
-                <input
-                  type="radio"
-                  name="visa-lawyer-mobile"
-                  className="h-5 w-5 rounded-full border-gray-300 text-gray-900 focus:ring-gray-300"
-                  checked={answer === false}
-                  onChange={() => setAnswer(false)}
-                />
-                <span className="text-[16px] text-gray-800">No</span>
+                Which visa would you like to apply for?*
               </label>
-            )}
-          </div>
-        </fieldset>
+              <input
+                id="visa-type-mobile-no"
+                type="text"
+                value={visaType}
+                onChange={(e) => setVisaType(e.target.value)}
+                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#5D3AF7] focus:border-transparent"
+                style={{ fontFamily: "var(--font-dm-sans)" }}
+              />
+            </div>
+          )}
 
-        {/* Additional text and visa input when No is selected (mobile) */}
-        {answer === false && (
-          <div className="mt-4">
-            <p
-              className="text-[16px] text-gray-700 mb-4"
-              style={{ fontFamily: "var(--font-dm-sans)" }}
-            >
-              We can connect you with one of our trusted partners.
-            </p>
-            <label
-              htmlFor="visa-type-mobile-no"
-              className="block text-[16px] text-gray-800 mb-2"
-              style={{ fontFamily: "var(--font-dm-sans)" }}
-            >
-              Which visa would you like to apply for?*
-            </label>
-            <input
-              id="visa-type-mobile-no"
-              type="text"
-              value={visaType}
-              onChange={(e) => setVisaType(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#5D3AF7] focus:border-transparent"
-              style={{ fontFamily: "var(--font-dm-sans)" }}
-              placeholder=""
-            />
-          </div>
-        )}
-
-        {/* Visa type input when Yes is selected (mobile) */}
-        {answer === true && (
-          <div className="mt-4">
-            <label
-              htmlFor="visa-type-mobile"
-              className="block text-[16px] text-gray-800 mb-2"
-              style={{ fontFamily: "var(--font-dm-sans)" }}
-            >
-              What visa will you be applying for?*
-            </label>
-            <input
-              id="visa-type-mobile"
-              type="text"
-              value={visaType}
-              onChange={(e) => setVisaType(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#5D3AF7] focus:border-transparent"
-              style={{ fontFamily: "var(--font-dm-sans)" }}
-              placeholder=""
-            />
-          </div>
-        )}
-      </MUIDrawer>
+          {answer === true && (
+            <div className="mt-4">
+              <label
+                htmlFor="visa-type-mobile"
+                className="block text-[16px] text-gray-800 mb-2"
+                style={{ fontFamily: "var(--font-dm-sans)" }}
+              >
+                What visa will you be applying for?*
+              </label>
+              <input
+                id="visa-type-mobile"
+                type="text"
+                value={visaType}
+                onChange={(e) => setVisaType(e.target.value)}
+                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#5D3AF7] focus:border-transparent"
+                style={{ fontFamily: "var(--font-dm-sans)" }}
+              />
+            </div>
+          )}
+        </MUIDrawer>
+      )}
     </>
   );
 }
