@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import Image from "next/image";
+import useMediaQuery from "@mui/material/useMediaQuery";
 import OptionButton from "./OptionButton";
 import ResponsiveDialog from "./ResponsiveDialog";
 import MUIDrawer from "./MUIDrawer";
@@ -18,10 +19,10 @@ type Props = {
     emailedCount: string;
     interviewedCount: string;
   }) => void;
-  onAcceptOffer?: () => void; // For the discount offer
-  onOfferModalShow?: () => void; // Callback when offer modal is shown
-  onOfferModalClose?: () => void; // Callback when offer modal is closed
-  onNextStep?: (reason: string) => void; // For step 3 - cancellation reason
+  onAcceptOffer?: () => void;
+  onOfferModalShow?: () => void;
+  onOfferModalClose?: () => void;
+  onNextStep?: (reason: string) => void;
   step?: number;
   totalSteps?: number;
 };
@@ -47,78 +48,56 @@ export default function CancellationSurveyModal({
   const [showFinalModal, setShowFinalModal] = useState(false);
   const [submittedReason, setSubmittedReason] = useState<string | null>(null);
 
-  // Check if all questions are answered
+  const isDesktop = useMediaQuery("(min-width:1024px)");
+
   const isFormValid = Boolean(appliedCount && emailedCount && interviewedCount);
 
   if (!visible) return null;
 
   const handleContinue = () => {
-    if (isFormValid) {
-      onSubmit({
-        appliedCount: appliedCount!,
-        emailedCount: emailedCount!,
-        interviewedCount: interviewedCount!,
-      });
-      // Show the reason modal for step 3
-      setShowReasonModal(true);
-    }
+    if (!isFormValid) return;
+    onSubmit({
+      appliedCount: appliedCount!,
+      emailedCount: emailedCount!,
+      interviewedCount: interviewedCount!,
+    });
+    setShowReasonModal(true);
   };
 
   const handleAcceptOffer = () => {
     setShowOfferModal(true);
-    // Notify parent that offer modal is being shown so it can hide itself
-    if (onOfferModalShow) {
-      onOfferModalShow();
-    }
+    onOfferModalShow?.();
   };
 
   const handleOfferModalClose = () => {
     setShowOfferModal(false);
-    // Notify parent that offer modal is closed so it can show itself again
-    if (onOfferModalClose) {
-      onOfferModalClose();
-    }
+    onOfferModalClose?.();
   };
 
   const handleLandDreamRole = () => {
     setShowOfferModal(false);
-    if (onAcceptOffer) {
-      onAcceptOffer();
-    }
-    // Also notify that offer modal is closed
-    if (onOfferModalClose) {
-      onOfferModalClose();
-    }
+    onAcceptOffer?.();
+    onOfferModalClose?.();
   };
 
   const handleReasonSubmit = (reason: string) => {
-    // store reason and show final modal; call onNextStep after final modal closes
     setSubmittedReason(reason);
     setShowReasonModal(false);
     setShowFinalModal(true);
   };
 
-  const handleReasonBack = () => {
-    setShowReasonModal(false);
-  };
+  const handleReasonBack = () => setShowReasonModal(false);
 
-  const handleReasonAcceptOffer = () => {
-    if (onAcceptOffer) {
-      onAcceptOffer();
-    }
-  };
+  const handleReasonAcceptOffer = () => onAcceptOffer?.();
 
   const handleFinalModalClose = () => {
     setShowFinalModal(false);
-    // After user closes final modal, notify parent about the completed reason step
-    if (submittedReason && onNextStep) {
-      onNextStep(submittedReason);
-    }
+    if (submittedReason && onNextStep) onNextStep(submittedReason);
     setSubmittedReason(null);
     onClose();
   };
 
-  // If the reason modal is showing, render it instead of the survey modal
+  // ======== Early returns for nested modals ========
   if (showReasonModal) {
     return (
       <CancellationReasonModal
@@ -133,7 +112,6 @@ export default function CancellationSurveyModal({
     );
   }
 
-  // If the final modal is showing, render it instead of other modals
   if (showFinalModal) {
     return (
       <CancellationFinalModal
@@ -143,7 +121,7 @@ export default function CancellationSurveyModal({
       />
     );
   }
-  // If the offer modal is showing, render it with proper z-index and hide the main modal
+
   if (showOfferModal) {
     return (
       <SubscriptionOfferModal
@@ -154,9 +132,9 @@ export default function CancellationSurveyModal({
     );
   }
 
-  // ======= Stepper UI =======
+  // ======= Stepper UI (left-aligned by default) =======
   const Stepper = () => (
-    <div className="flex items-center gap-3">
+    <div className="flex items-center justify-start gap-3">
       <div className="flex items-center gap-2">
         {Array.from({ length: totalSteps }).map((_, i) => {
           const idx = i + 1;
@@ -187,8 +165,8 @@ export default function CancellationSurveyModal({
     </div>
   );
 
-  // ======= Main content =======
-  const Content = () => (
+  // ======= Content (Desktop) =======
+  const ContentDesktop = () => (
     <>
       <h2
         className="text-[28px] md:text-[34px] font-semibold text-gray-800 leading-snug"
@@ -197,64 +175,7 @@ export default function CancellationSurveyModal({
         Help us understand how you were using Migrate Mate.
       </h2>
 
-      <div className="mt-6 space-y-6">
-        <div>
-          <p
-            className="text-[15px] text-gray-700 mb-2"
-            style={{ fontFamily: "var(--font-dm-sans)" }}
-          >
-            How many roles did you apply for through Migrate Mate?
-          </p>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            {["0", "1 - 5", "6 - 20", "20+"].map((val) => (
-              <OptionButton
-                key={val}
-                label={val}
-                active={appliedCount === val}
-                onClick={() => setAppliedCount(val)}
-              />
-            ))}
-          </div>
-        </div>
-
-        <div>
-          <p
-            className="text-[15px] text-gray-700 mb-2"
-            style={{ fontFamily: "var(--font-dm-sans)" }}
-          >
-            How many companies did you <u>email</u> directly?
-          </p>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            {["0", "1-5", "6-20", "20+"].map((val) => (
-              <OptionButton
-                key={val}
-                label={val}
-                active={emailedCount === val}
-                onClick={() => setEmailedCount(val)}
-              />
-            ))}
-          </div>
-        </div>
-
-        <div>
-          <p
-            className="text-[15px] text-gray-700 mb-2"
-            style={{ fontFamily: "var(--font-dm-sans)" }}
-          >
-            How many different companies did you <u>interview</u> with?
-          </p>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            {["0", "1-2", "3-5", "5+"].map((val) => (
-              <OptionButton
-                key={val}
-                label={val}
-                active={interviewedCount === val}
-                onClick={() => setInterviewedCount(val)}
-              />
-            ))}
-          </div>
-        </div>
-      </div>
+      <DesktopQuestions />
 
       <div className="mt-8">
         {/* Discount offer button */}
@@ -269,7 +190,7 @@ export default function CancellationSurveyModal({
           <span className="text-sm line-through text-green-200 ml-1">$25</span>
         </button>
 
-        {/* Continue button - show on desktop */}
+        {/* Continue button - desktop */}
         <button
           onClick={handleContinue}
           disabled={!isFormValid}
@@ -287,17 +208,143 @@ export default function CancellationSurveyModal({
     </>
   );
 
+  // ======= Content (Mobile — matches Figma) =======
+  const ContentMobile = () => (
+    <>
+      <h2
+        className="text-[28px] font-semibold text-gray-800 leading-snug"
+        style={{ fontFamily: "var(--font-dm-sans)" }}
+      >
+        What’s the main reason for cancelling?
+      </h2>
+
+      {/* subtle divider under the heading, as in your screenshot */}
+      <div className="mt-3 mb-4 h-px bg-gray-200" />
+
+      <MobileQuestions />
+    </>
+  );
+
+  // ======= Questions grid (shared helpers) =======
+  function DesktopQuestions() {
+    return (
+      <div className="mt-6 space-y-6">
+        <Question
+          label="How many roles did you apply for through Migrate Mate?"
+          options={["0", "1 - 5", "6 - 20", "20+"]}
+          value={appliedCount}
+          onChange={setAppliedCount}
+        />
+        <Question
+          label={
+            <>
+              How many companies did you <u>email</u> directly?
+            </>
+          }
+          options={["0", "1-5", "6-20", "20+"]}
+          value={emailedCount}
+          onChange={setEmailedCount}
+        />
+        <Question
+          label={
+            <>
+              How many different companies did you <u>interview</u> with?
+            </>
+          }
+          options={["0", "1-2", "3-5", "5+"]}
+          value={interviewedCount}
+          onChange={setInterviewedCount}
+        />
+      </div>
+    );
+  }
+
+  function MobileQuestions() {
+    return (
+      <div className="mt-2 space-y-6">
+        <Question
+          label="How many roles did you apply for through Migrate Mate?"
+          options={["0", "1 - 5", "6 - 20", "20+"]}
+          value={appliedCount}
+          onChange={setAppliedCount}
+          mobile
+        />
+        <Question
+          label={
+            <>
+              How many companies did you <u>email</u> directly?
+            </>
+          }
+          options={["0", "1-5", "6-20", "20+"]}
+          value={emailedCount}
+          onChange={setEmailedCount}
+          mobile
+        />
+        <Question
+          label={
+            <>
+              How many different companies did you <u>interview</u> with?
+            </>
+          }
+          options={["0", "1-2", "3-5", "5+"]}
+          value={interviewedCount}
+          onChange={setInterviewedCount}
+          mobile
+        />
+      </div>
+    );
+  }
+
+  function Question({
+    label,
+    options,
+    value,
+    onChange,
+    mobile = false,
+  }: {
+    label: React.ReactNode;
+    options: string[];
+    value: string | null;
+    onChange: (v: string) => void;
+    mobile?: boolean;
+  }) {
+    return (
+      <div>
+        <p
+          className="text-[15px] text-gray-700 mb-2"
+          style={{ fontFamily: "var(--font-dm-sans)" }}
+        >
+          {label}
+        </p>
+        <div
+          className={[
+            // Figma shows 4 across even on mobile
+            mobile ? "grid grid-cols-4 gap-3" : "grid grid-cols-2 md:grid-cols-4 gap-3",
+          ].join(" ")}
+        >
+          {options.map((val) => (
+            <OptionButton
+              key={val}
+              label={val}
+              active={value === val}
+              onClick={() => onChange(val)}
+            />
+          ))}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <>
       {/* ======== Desktop dialog (MUI) ======== */}
-      <div className="hidden lg:block">
+      {isDesktop && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/30"
           role="dialog"
           aria-modal="true"
           aria-labelledby="survey-title"
           onClick={(e) => {
-            // click outside closes
             if (e.target === e.currentTarget) onClose();
           }}
         >
@@ -307,31 +354,19 @@ export default function CancellationSurveyModal({
             maxWidth="lg"
             fullWidth
             paperSx={{ borderRadius: 6 }}
+            desktopOnly
           >
-            {/* Desktop header: back (left), centered title+stepper, close (right) */}
+            {/* Desktop header */}
             <div className="w-full px-5 md:px-6 py-4 border-b border-gray-200 flex items-center justify-between">
               <button
                 onClick={() => (onBack ? onBack() : onClose())}
                 className="flex items-center gap-2 text-gray-700 hover:text-gray-900"
                 aria-label="Back"
               >
-                <svg
-                  className="w-5 h-5"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M15 19l-7-7 7-7"
-                  />
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                 </svg>
-                <span
-                  className="text-sm"
-                  style={{ fontFamily: "var(--font-dm-sans)" }}
-                >
+                <span className="text-sm" style={{ fontFamily: "var(--font-dm-sans)" }}>
                   Back
                 </span>
               </button>
@@ -352,25 +387,15 @@ export default function CancellationSurveyModal({
                 className="p-1.5 text-gray-400 hover:text-gray-600"
                 aria-label="Close"
               >
-                <svg
-                  className="w-6 h-6"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M6 18L18 6M6 6l12 12"
-                  />
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-[1.1fr_0.9fr] gap-8 p-6 md:p-10">
               <div className="max-w-[760px]">
-                <Content />
+                <ContentDesktop />
               </div>
 
               <div className="flex items-start justify-center">
@@ -388,51 +413,49 @@ export default function CancellationSurveyModal({
             </div>
           </ResponsiveDialog>
         </div>
-      </div>
+      )}
 
-      {/* ======== Mobile drawer ======== */}
-      <MUIDrawer
-        open={visible}
-        onClose={onClose}
-        title="Subscription Cancellation"
-        showGrabHandle={false}
-        headerContent={<Stepper />}
-        backButton={{
-          onBack: onBack ? onBack : onClose,
-          label: "Back",
-        }}
-        stickyFooter={
-          <div className="space-y-3">
-            <button
-              onClick={handleAcceptOffer}
-              className="w-full py-3.5 rounded-2xl font-semibold text-white bg-[#28B463] hover:bg-[#24A259] transition-colors flex items-center justify-center gap-2"
-              style={{ fontFamily: "var(--font-dm-sans)" }}
-            >
-              <span>Get 50% off</span>
-              <span className="text-lg">|</span>
-              <span className="text-lg font-bold">$12.50</span>
-              <span className="text-sm line-through text-green-200 ml-1">
-                $25
-              </span>
-            </button>
-            <button
-              onClick={handleContinue}
-              disabled={!isFormValid}
-              className={[
-                "w-full py-3.5 rounded-2xl font-semibold transition-colors",
-                isFormValid
-                  ? "bg-red-500 text-white hover:bg-red-600"
-                  : "bg-gray-100 text-gray-400 border border-gray-200 cursor-not-allowed",
-              ].join(" ")}
-              style={{ fontFamily: "var(--font-dm-sans)" }}
-            >
-              Continue
-            </button>
-          </div>
-        }
-      >
-        <Content />
-      </MUIDrawer>
+      {/* ======== Mobile drawer (<1024px) ======== */}
+      {!isDesktop && (
+        <MUIDrawer
+          open={visible}
+          onClose={onClose}
+          title="Subscription Cancellation"
+          showGrabHandle
+          headerContent={<Stepper />}
+          backButton={{ onBack: onBack ? onBack : onClose, label: "Back" }}
+          maxHeight="min(75dvh,75vh)"
+          stickyFooter={
+            <div className="space-y-3">
+              <button
+                onClick={handleAcceptOffer}
+                className="w-full h-[56px] rounded-2xl font-semibold text-white bg-[#28B463] hover:bg-[#24A259] transition-colors flex items-center justify-center gap-2"
+                style={{ fontFamily: "var(--font-dm-sans)" }}
+              >
+                <span>Get 50% off</span>
+                <span className="text-lg">|</span>
+                <span className="text-lg font-bold">$12.50</span>
+                <span className="text-sm line-through text-green-200 ml-1">$25</span>
+              </button>
+              <button
+                onClick={handleContinue}
+                disabled={!isFormValid}
+                className={[
+                  "w-full h-[56px] rounded-2xl font-semibold transition-colors",
+                  isFormValid
+                    ? "bg-red-500 text-white hover:bg-red-600"
+                    : "bg-gray-100 text-gray-400 border border-gray-200 cursor-not-allowed",
+                ].join(" ")}
+                style={{ fontFamily: "var(--font-dm-sans)" }}
+              >
+                Continue
+              </button>
+            </div>
+          }
+        >
+          <ContentMobile />
+        </MUIDrawer>
+      )}
     </>
   );
 }
