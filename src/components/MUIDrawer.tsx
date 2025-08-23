@@ -16,14 +16,13 @@ interface MUIDrawerProps {
   onOpen?: () => void;
   title: string;
   children: React.ReactNode;
-  headerContent?: React.ReactNode;
+  headerContent?: React.ReactNode; // stepper
   backButton?: { onBack: () => void; label?: string };
   stickyFooter?: React.ReactNode;
   showGrabHandle?: boolean;
-  maxHeight?: string; // e.g. "min(75dvh,75vh)"
+  maxHeight?: string;
 }
 
-/** Tailwind‑aligned breakpoint: mobile = < 1024px */
 const useIsMobile = () => useMediaQuery("(max-width: 1023.98px)");
 
 const GrabHandle = styled("div")(() => ({
@@ -34,13 +33,12 @@ const GrabHandle = styled("div")(() => ({
   margin: "10px auto 6px auto",
 }));
 
-const Header = styled(Box)(() => ({
+/** Top bar: title left + close right */
+const HeaderTop = styled(Box)(() => ({
   padding: "12px 20px",
-  borderBottom: "1px solid #E5E7EB",
   display: "flex",
   alignItems: "center",
-  justifyContent: "flex-start",
-  position: "relative",
+  justifyContent: "space-between",
   minHeight: 52,
 }));
 
@@ -73,11 +71,8 @@ export default function MUIDrawer({
   maxHeight = "min(75dvh,75vh)",
 }: MUIDrawerProps) {
   const isMobile = useIsMobile();
-
-  // Only render on mobile; desktop uses your dialog
   if (!isMobile) return null;
 
-  // iOS perf flags (optional)
   const iOS =
     typeof navigator !== "undefined" &&
     /iPad|iPhone|iPod/.test(navigator.userAgent);
@@ -116,12 +111,11 @@ export default function MUIDrawer({
         },
       }}
     >
-      <Box
-        sx={{ display: "flex", flexDirection: "column", maxHeight: "inherit" }}
-      >
+      <Box sx={{ display: "flex", flexDirection: "column", maxHeight: "inherit" }}>
         {showGrabHandle && <GrabHandle />}
 
-        <Header>
+        {/* Row 1: Title (left) + Close (right) */}
+        <HeaderTop>
           <Typography
             variant="h6"
             component="h3"
@@ -139,10 +133,6 @@ export default function MUIDrawer({
           <IconButton
             onClick={onClose}
             sx={{
-              position: "absolute",
-              right: 8,
-              top: "50%",
-              transform: "translateY(-50%)",
               color: "#6B7280",
               "&:hover": { color: "#374151" },
             }}
@@ -150,16 +140,18 @@ export default function MUIDrawer({
           >
             <CloseIcon />
           </IconButton>
-        </Header>
+        </HeaderTop>
 
+        {/* Row 2: Stepper (left aligned) */}
         {headerContent && (
-          <Box sx={{ px: 2, py: 1.25, borderBottom: "1px solid #E5E7EB" }}>
+          <Box sx={{ px: 2, py: 1.25, display: "flex", justifyContent: "flex-start" }}>
             {headerContent}
           </Box>
         )}
 
+        {/* Row 3: Back button (left aligned) */}
         {backButton && (
-          <Box sx={{ px: 2.5, py: 1.25, borderBottom: "1px solid #E5E7EB" }}>
+          <Box sx={{ px: 2.5, py: 1.25 }}>
             <Box
               component="button"
               onClick={backButton.onBack}
