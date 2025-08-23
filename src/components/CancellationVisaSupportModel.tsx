@@ -170,10 +170,26 @@ export default function CancellationVisaSupportModal({
             id="visa-type-yes"
             type="text"
             value={visaType}
-            onChange={(e) => setVisaType(e.target.value)}
+            minLength={2}
+            onChange={(e) => {
+              const val = e.target.value;
+              if (val.length === 0 || val.length >= 2) {
+          setVisaType(val);
+              } else {
+          setVisaType(val);
+              }
+            }}
             className="w-full max-w-[560px] px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#5D3AF7] focus:border-transparent"
             style={{ fontFamily: "var(--font-dm-sans)" }}
+            required
+            pattern=".{2,}"
+            title="Please enter at least 2 characters"
           />
+          {visaType.length > 0 && visaType.length < 2 && (
+            <p className="text-red-500 text-sm mt-1" style={{ fontFamily: "var(--font-dm-sans)" }}>
+              Please enter at least 2 characters.
+            </p>
+          )}
         </div>
       )}
 

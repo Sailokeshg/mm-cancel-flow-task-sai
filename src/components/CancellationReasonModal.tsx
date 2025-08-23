@@ -264,7 +264,7 @@ export default function CancellationReasonModal({
                 $
               </span>
               <input
-                type="text"
+                type="number"
                 value={maxPrice}
                 onChange={(e) => setMaxPrice(e.target.value)}
                 className="w-full pl-8 pr-4 py-3 rounded-2xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:border-gray-300 text-gray-800"
