@@ -3,6 +3,8 @@
 import React from "react";
 import Image from "next/image";
 import useMediaQuery from "@mui/material/useMediaQuery";
+import IconButton from "@mui/material/IconButton";
+import CloseIcon from "@mui/icons-material/Close";
 import ResponsiveDialog from "./ResponsiveDialog";
 import MUIDrawer from "./MUIDrawer";
 
@@ -45,13 +47,35 @@ export default function CancellationModal({
             paperSx={{ borderRadius: 6 }}
             desktopOnly // <-- prevents portal on mobile if someone reuses this
             title={
-              <h3
-                id="cancel-title"
-                className="text-lg font-semibold text-gray-900"
-                style={{ fontFamily: "var(--font-dm-sans)" }}
+              <div
+                style={{
+                  position: "relative",
+                  width: "100%",
+                  paddingRight: 56,
+                }}
               >
-                Subscription Cancellation
-              </h3>
+                <h3
+                  id="cancel-title"
+                  className="text-lg font-semibold text-gray-900 flex justify-center"
+                  style={{ fontFamily: "var(--font-dm-sans)", margin: 0 }}
+                >
+                  Subscription Cancellation
+                </h3>
+
+                <IconButton
+                  onClick={onClose}
+                  aria-label="Close"
+                  size="small"
+                  style={{
+                    position: "absolute",
+                    right: 12,
+                    top: 2,
+                    color: "#6B7280",
+                  }}
+                >
+                  <CloseIcon fontSize="small" />
+                </IconButton>
+              </div>
             }
           >
             <div className="grid grid-cols-1 lg:grid-cols-[1.1fr_0.9fr] gap-8 p-6 md:p-10">
@@ -164,8 +188,8 @@ export default function CancellationModal({
             className="mt-3 text-[16px] leading-[1.6] text-gray-600"
             style={{ fontFamily: "var(--font-dm-sans)" }}
           >
-            Whatever your answer, we just want to help you take the next step. With
-            visa support, or by hearing how we can do better.
+            Whatever your answer, we just want to help you take the next step.
+            With visa support, or by hearing how we can do better.
           </p>
 
           <div className="my-5 h-px bg-gray-200" />
