@@ -4,6 +4,8 @@ import { useState } from "react";
 import CancellationModal from "../components/CancellationModal";
 import JobFoundModal from "../components/JobFoundModal";
 import JobSearchModal from "../components/JobSearchModal";
+import CancellationCompletionModal from "../components/CancellationCompletionModal";
+import SubscriptionOfferModal from "../components/SubscriptionOfferModal";
 // Mock user data for UI display
 const mockUser = {
   email: "user@example.com",
@@ -60,10 +62,23 @@ export default function ProfilePage() {
 
   const [showJobFoundModal, setShowJobFoundModal] = useState(false);
   const [showJobSearchModal, setShowJobSearchModal] = useState(false);
+  const [showCompletionModal, setShowCompletionModal] = useState(false);
+  const [showSubscriptionOfferModal, setShowSubscriptionOfferModal] =
+    useState(false);
 
   const openJobFoundModal = () => {
     setShowCancellationModal(false);
     setShowJobFoundModal(true);
+  };
+
+  const handleJobFoundModalClose = () => {
+    setShowJobFoundModal(false);
+    // Show completion modal after the 3-step flow is complete
+    setShowCompletionModal(true);
+  };
+
+  const handleCompletionModalClose = () => {
+    setShowCompletionModal(false);
   };
 
   const handleStillLooking = () => {
@@ -437,6 +452,7 @@ export default function ProfilePage() {
         onAccept={() => {
           console.log("User accepted downsell offer");
           setShowJobSearchModal(false);
+          setShowSubscriptionOfferModal(true);
         }}
         onDecline={() => {
           console.log("User declined downsell offer");
@@ -445,13 +461,27 @@ export default function ProfilePage() {
       />
       <JobFoundModal
         visible={showJobFoundModal}
-        onClose={() => setShowJobFoundModal(false)}
+        onClose={handleJobFoundModalClose}
         onBack={() => {
           setShowJobFoundModal(false);
           setShowCancellationModal(true);
         }}
       />
-      
+
+      <CancellationCompletionModal
+        visible={showCompletionModal}
+        onClose={handleCompletionModalClose}
+        totalSteps={3}
+      />
+
+      <SubscriptionOfferModal
+        visible={showSubscriptionOfferModal}
+        onClose={() => setShowSubscriptionOfferModal(false)}
+        onLandDreamRole={() => {
+          console.log("User clicked Land your dream role");
+          setShowSubscriptionOfferModal(false);
+        }}
+      />
     </div>
   );
 }

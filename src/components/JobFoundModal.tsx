@@ -5,7 +5,6 @@ import Image from "next/image";
 import OptionButton from "./OptionButton";
 import CancellationFeedbackModal from "./CancellationFeedbackModal";
 import CancellationVisaSupportModal from "./CancellationVisaSupportModel";
-import CancellationCompletionModal from "./CancellationCompletionModal";
 import ResponsiveDialog from "./ResponsiveDialog";
 import MUIDrawer from "./MUIDrawer";
 
@@ -16,13 +15,13 @@ type Props = {
 };
 
 export default function JobFoundModal({ visible, onClose, onBack }: Props) {
-  // ======= Steps (now 4 total to include completion) =======
-  const TOTAL_STEPS = 4;
+  // ======= Steps (3 total as per Figma) =======
+  const TOTAL_STEPS = 3;
   const [step, setStep] = useState(1);
   const [foundVia, setFoundVia] = useState<string | null>(null);
 
   const goToStep = (n: number) =>
-    setStep(Math.min(Math.max(n, 1), TOTAL_STEPS)); // Now handles 4 steps
+    setStep(Math.min(Math.max(n, 1), TOTAL_STEPS)); // Handles 3 steps
 
   // ======= Form state (Step 1) =======
   const [appliedCount, setAppliedCount] = useState<string | null>(null);
@@ -60,6 +59,7 @@ export default function JobFoundModal({ visible, onClose, onBack }: Props) {
           // Always go to step 3 (visa support) regardless of MigrateMate answer
           goToStep(3);
         }}
+        totalSteps={TOTAL_STEPS}
       />
     );
   }
@@ -74,21 +74,10 @@ export default function JobFoundModal({ visible, onClose, onBack }: Props) {
         onClose={onClose}
         onComplete={(companyProvidesLawyer) => {
           console.log("Company provides lawyer:", companyProvidesLawyer);
-          // Go to completion screen instead of closing
-          goToStep(4);
+          // After step 3 completes, close and let parent handle completion modal
+          onClose();
         }}
         foundViaYes={foundVia === "yes"} // Pass this to customize the text content
-        totalSteps={TOTAL_STEPS}
-      />
-    );
-  }
-
-  // When the user advances to step 4, render the completion modal
-  if (step === 4) {
-    return (
-      <CancellationCompletionModal
-        visible={true}
-        onClose={onClose}
         totalSteps={TOTAL_STEPS}
       />
     );

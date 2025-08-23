@@ -60,7 +60,7 @@ export default function JobSearchModal({
 
   // ===== Offer card =====
   const OfferCard = () => (
-    <div className="rounded-2xl border border-[#C9B7FF] bg-[#EFE4FF]/70 p-4 md:p-5 shadow-sm">
+    <div className="rounded-2xl border border-[#C9B7FF] bg-[#EFE4FF]/70 p-4 md:p-5  justify-center shadow-sm">
       <h3
         className="text-[22px] md:text-[26px] font-semibold text-gray-900"
         style={{ fontFamily: "var(--font-dm-sans)" }}
@@ -68,7 +68,7 @@ export default function JobSearchModal({
         Here’s <u>50% off</u> until you find a job.
       </h3>
 
-      <div className="mt-3 flex items-baseline gap-6">
+      <div className="mt-3 flex items-center justify-center gap-6">
         <div
           className="text-[22px] md:text-[24px] font-extrabold text-[#5D3AF7]"
           style={{ fontFamily: "var(--font-dm-sans)" }}
