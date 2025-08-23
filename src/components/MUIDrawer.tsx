@@ -87,7 +87,13 @@ export default function MUIDrawer({
       disableDiscovery={iOS}
       ModalProps={{
         keepMounted: true,
-        sx: { "& .MuiBackdrop-root": { backgroundColor: "rgba(0,0,0,0.35)" } },
+        sx: {
+          "& .MuiBackdrop-root": {
+            backgroundColor: "rgba(255,255,255,0.55)",
+            backdropFilter: "blur(50px) brightness(0.9)",
+            WebkitBackdropFilter: "blur(50px) brightness(0.9)",
+          },
+        },
       }}
       PaperProps={{
         sx: {
@@ -111,7 +117,9 @@ export default function MUIDrawer({
         },
       }}
     >
-      <Box sx={{ display: "flex", flexDirection: "column", maxHeight: "inherit" }}>
+      <Box
+        sx={{ display: "flex", flexDirection: "column", maxHeight: "inherit" }}
+      >
         {showGrabHandle && <GrabHandle />}
 
         {/* Row 1: Title (left) + Close (right) */}
@@ -144,7 +152,14 @@ export default function MUIDrawer({
 
         {/* Row 2: Stepper (left aligned) */}
         {headerContent && (
-          <Box sx={{ px: 2, py: 1.25, display: "flex", justifyContent: "flex-start" }}>
+          <Box
+            sx={{
+              px: 2,
+              py: 1.25,
+              display: "flex",
+              justifyContent: "flex-start",
+            }}
+          >
             {headerContent}
           </Box>
         )}

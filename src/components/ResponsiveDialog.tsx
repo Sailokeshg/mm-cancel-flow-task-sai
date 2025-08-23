@@ -53,6 +53,13 @@ export default function ResponsiveDialog({
           ...paperSx,
         },
       }}
+      BackdropProps={{
+        sx: {
+          backgroundColor: "rgba(255,255,255,0.55)",
+          backdropFilter: "blur(50px) brightness(0.9)",
+          WebkitBackdropFilter: "blur(50px) brightness(0.9)",
+        },
+      }}
       aria-labelledby={
         typeof title === "string" ? "responsive-dialog-title" : undefined
       }

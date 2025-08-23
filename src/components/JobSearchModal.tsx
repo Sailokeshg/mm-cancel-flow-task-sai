@@ -110,7 +110,7 @@ export default function JobSearchModal({
         Here’s <u>50% off</u> until you find a job.
       </h3>
 
-      <div className="mt-4 flex items-center justify-start gap-5">
+      <div className=" flex items-center justify-center gap-5">
         <div
           className="text-[26px] md:text-[28px] font-extrabold text-[#5D3AF7]"
           style={{ fontFamily: "var(--font-dm-sans)" }}
@@ -131,7 +131,7 @@ export default function JobSearchModal({
       </button>
 
       <p
-        className="mt-3 text-[15px] italic text-gray-600 text-center"
+        className=" text-[15px] italic text-gray-600 text-center"
         style={{ fontFamily: "var(--font-dm-sans)" }}
       >
         You won’t be charged until your next billing date.
@@ -142,7 +142,7 @@ export default function JobSearchModal({
   const LeftContent = () => (
     <div className="max-w-[760px]">
       <h1
-        className="text-[44px] font-semibold text-gray-800 leading-[1.1] -mt-4"
+        className="text-[44px] font-semibold text-gray-800 leading-[1.1] "
         style={{ fontFamily: "var(--font-dm-sans)" }}
       >
         We built this to help you land the job, this makes it a little easier.

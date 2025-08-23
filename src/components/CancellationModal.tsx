@@ -31,10 +31,15 @@ export default function CancellationModal({
       {/* ===== Desktop dialog (renders ONLY on >=1024px) ===== */}
       {isDesktop && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/30"
+          className="fixed inset-0 z-50 flex items-center justify-center "
           role="dialog"
           aria-modal="true"
           aria-labelledby="cancel-title"
+           style={{
+    backgroundColor: "rgba(255,255,255,0.55)",       
+    backdropFilter: "blur(50px) brightness(0.9)",    
+    WebkitBackdropFilter: "blur(50px) brightness(0.9)"
+  }}
           onClick={(e) => {
             if (e.target === e.currentTarget) onClose();
           }}
@@ -98,7 +103,7 @@ export default function CancellationModal({
                   </p>
 
                   <p
-                    className="text-gray-600 text-base md:text-[17px] leading-relaxed mt-4"
+                    className="text-gray-700 text-base md:text-[16px] leading-relaxed mt-4"
                     style={{ fontFamily: "var(--font-dm-sans)" }}
                   >
                     Whatever your answer, we just want to help you take the next
