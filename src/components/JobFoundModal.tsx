@@ -1,15 +1,13 @@
 "use client";
 
-import React, {
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-  useCallback,
-} from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import OptionButton from "./OptionButton";
 import CancellationFeedbackModal from "./CancellationFeedbackModal";
+import CancellationVisaSupportModal from "./CancellationVisaSupportModel";
+import CancellationCompletionModal from "./CancellationCompletionModal";
+import ResponsiveDialog from "./ResponsiveDialog";
+import MUIDrawer from "./MUIDrawer";
 
 type Props = {
   visible: boolean;
@@ -18,62 +16,34 @@ type Props = {
 };
 
 export default function JobFoundModal({ visible, onClose, onBack }: Props) {
-  // ======= Steps (3 total) =======
-  const TOTAL_STEPS = 3;
+  // ======= Steps (now 4 total to include completion) =======
+  const TOTAL_STEPS = 4;
   const [step, setStep] = useState(1);
+  const [foundVia, setFoundVia] = useState<string | null>(null);
+
   const goToStep = (n: number) =>
-    setStep(Math.min(Math.max(n, 1), TOTAL_STEPS));
+    setStep(Math.min(Math.max(n, 1), TOTAL_STEPS)); // Now handles 4 steps
 
   // ======= Form state (Step 1) =======
-  const [foundVia, setFoundVia] = useState<string | null>(null);
   const [appliedCount, setAppliedCount] = useState<string | null>(null);
   const [emailedCount, setEmailedCount] = useState<string | null>(null);
   const [interviewedCount, setInterviewedCount] = useState<string | null>(null);
 
-  // ======= Bottom sheet state (mobile) =======
-  const sheetRef = useRef<HTMLDivElement>(null);
-  const startYRef = useRef<number | null>(null);
-  const startTranslateRef = useRef<number>(0);
-  const [translateY, setTranslateY] = useState(0);
-  const [dragging, setDragging] = useState(false);
-
-  const snaps = useMemo(() => {
-    const h = typeof window !== "undefined" ? window.innerHeight : 800;
-    return {
-      FULL: 0,
-      MID: Math.round(h * 0.35),
-      CLOSED: Math.round(h * 0.9),
-      CLOSE_THRESHOLD: Math.round(h * 0.6),
-    };
-  }, []);
-
+  // Reset to step 1 and clear form when modal becomes visible
   useEffect(() => {
-    if (!visible) return;
-    // open as full on mobile
-    setTranslateY(0);
+    if (visible) {
+      setStep(1);
+      setFoundVia(null);
+      setAppliedCount(null);
+      setEmailedCount(null);
+      setInterviewedCount(null);
+    }
   }, [visible]);
 
-  // lock body scroll when dialog is open
-  useEffect(() => {
-    if (!visible) return;
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.body.style.overflow = prev;
-    };
-  }, [visible]);
-
-  // ESC to close
-  const onKeyDown = useCallback(
-    (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-    },
-    [onClose]
+  // validity for step 1: require answers for all questions
+  const isStepOneValid = Boolean(
+    foundVia && appliedCount && emailedCount && interviewedCount
   );
-  useEffect(() => {
-    document.addEventListener("keydown", onKeyDown);
-    return () => document.removeEventListener("keydown", onKeyDown);
-  }, [onKeyDown]);
 
   if (!visible) return null;
 
@@ -84,27 +54,52 @@ export default function JobFoundModal({ visible, onClose, onBack }: Props) {
       <CancellationFeedbackModal
         visible={true}
         onBack={() => goToStep(1)}
-        onClose={() => goToStep(3)}
+        onClose={onClose}
         onSubmit={(feedback) => {
           console.log("cancellation feedback:", feedback);
+          // Always go to step 3 (visa support) regardless of MigrateMate answer
+          goToStep(3);
         }}
       />
     );
   }
 
+  // When the user advances to step 3, render the visa support modal
+  // Show visa support modal for both "Yes" and "No" answers, but with different text
+  if (step === 3) {
+    return (
+      <CancellationVisaSupportModal
+        visible={true}
+        onBack={() => goToStep(2)}
+        onClose={onClose}
+        onComplete={(companyProvidesLawyer) => {
+          console.log("Company provides lawyer:", companyProvidesLawyer);
+          // Go to completion screen instead of closing
+          goToStep(4);
+        }}
+        foundViaYes={foundVia === "yes"} // Pass this to customize the text content
+        totalSteps={TOTAL_STEPS}
+      />
+    );
+  }
+
+  // When the user advances to step 4, render the completion modal
+  if (step === 4) {
+    return (
+      <CancellationCompletionModal
+        visible={true}
+        onClose={onClose}
+        totalSteps={TOTAL_STEPS}
+      />
+    );
+  }
+
   const onContinue = () => {
-    if (step < TOTAL_STEPS) {
-      goToStep(step + 1);
+    if (step === 1 && isStepOneValid) {
+      goToStep(2); // Go to feedback modal
       return;
     }
-    console.log({
-      step,
-      foundVia,
-      appliedCount,
-      emailedCount,
-      interviewedCount,
-    });
-    onClose();
+    // Steps 2 and 3 are handled by their respective modals
   };
 
   // ======= Stepper UI =======
@@ -230,10 +225,10 @@ export default function JobFoundModal({ visible, onClose, onBack }: Props) {
       <hr className="hidden lg:block mt-6 mb-4 border-gray-200" />
       <button
         onClick={onContinue}
-        disabled={!foundVia}
+        disabled={!isStepOneValid}
         className={[
           "hidden lg:block w-full py-3.5 rounded-2xl font-semibold transition-colors",
-          foundVia
+          isStepOneValid
             ? "bg-[#5D3AF7] text-white hover:bg-[#4F2FF3]"
             : "bg-gray-100 text-gray-400 cursor-not-allowed",
         ].join(" ")}
@@ -244,177 +239,68 @@ export default function JobFoundModal({ visible, onClose, onBack }: Props) {
     </>
   );
 
-  // ======= Drag helpers (header as handle) =======
-  const onDragStart = (clientY: number) => {
-    setDragging(true);
-    startYRef.current = clientY;
-    startTranslateRef.current = translateY;
-  };
-  const onDragMove = (clientY: number) => {
-    if (startYRef.current == null) return;
-    const dy = clientY - startYRef.current;
-    const next = Math.max(
-      0,
-      Math.min(startTranslateRef.current + dy, snaps.CLOSED)
-    );
-    setTranslateY(next);
-  };
-  const onDragEnd = () => {
-    setDragging(false);
-    startYRef.current = null;
-
-    if (translateY > snaps.CLOSE_THRESHOLD) {
-      onClose();
-      return;
-    }
-    const target =
-      Math.abs(translateY - snaps.FULL) < Math.abs(translateY - snaps.MID)
-        ? snaps.FULL
-        : snaps.MID;
-    setTranslateY(target);
-  };
-  const handleTouchStart = (e: React.TouchEvent) =>
-    onDragStart(e.touches[0].clientY);
-  const handleTouchMove = (e: React.TouchEvent) =>
-    onDragMove(e.touches[0].clientY);
-  const handleTouchEnd = () => onDragEnd();
-  const handleMouseDown = (e: React.MouseEvent) => {
-    onDragStart(e.clientY);
-    const move = (ev: MouseEvent) => onDragMove(ev.clientY);
-    const up = () => {
-      window.removeEventListener("mousemove", move);
-      window.removeEventListener("mouseup", up);
-      onDragEnd();
-    };
-    window.addEventListener("mousemove", move);
-    window.addEventListener("mouseup", up);
-  };
-
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-end lg:items-center justify-center bg-black/30"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="job-found-title"
-      onClick={(e) => {
-        // click outside closes
-        if (e.target === e.currentTarget) onClose();
-      }}
-    >
-      {/* ======== Desktop dialog (unchanged from your final) ======== */}
-      <div className="hidden lg:block w-full max-w-6xl mx-4 bg-white rounded-[24px] shadow-[0_30px_80px_rgba(0,0,0,0.25)] border border-gray-200 overflow-hidden">
-        {/* Header */}
-        <div className="w-full px-5 md:px-6 py-4 border-b border-gray-200 flex items-center justify-between">
-          <button
-            onClick={() => (onBack ? onBack() : onClose())}
-            className="flex items-center gap-2 text-gray-700 hover:text-gray-900"
-            aria-label="Back"
+    <>
+      {/* ======== Desktop dialog (MUI) ======== */}
+      <div className="hidden lg:block">
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/30"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="job-found-title"
+          onClick={(e) => {
+            // click outside closes
+            if (e.target === e.currentTarget) onClose();
+          }}
+        >
+          <ResponsiveDialog
+            open={visible}
+            onClose={onClose}
+            maxWidth="lg"
+            fullWidth
+            paperSx={{ borderRadius: 6 }}
           >
-            <svg
-              className="w-5 h-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M15 19l-7-7 7-7"
-              />
-            </svg>
-            <span
-              className="text-sm"
-              style={{ fontFamily: "var(--font-dm-sans)" }}
-            >
-              Back
-            </span>
-          </button>
-
-          <div className="flex items-center gap-4">
-            <h3
-              id="job-found-title"
-              className="text-base md:text-lg font-semibold text-gray-900"
-              style={{ fontFamily: "var(--font-dm-sans)" }}
-            >
-              Subscription Cancellation
-            </h3>
-            <Stepper />
-          </div>
-
-          <button
-            onClick={onClose}
-            className="p-1.5 text-gray-400 hover:text-gray-600"
-            aria-label="Close"
-          >
-            <svg
-              className="w-6 h-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
-          </button>
-        </div>
-
-        {/* Body */}
-        <div className="grid grid-cols-1 lg:grid-cols-[1.1fr_0.9fr] gap-8 p-6 md:p-10">
-          <div className="max-w-[760px]">{step === 1 && <StepOne />}</div>
-
-          <div className="flex items-start justify-center">
-            <div className="relative w-full h-[480px] md:h-[560px] rounded-3xl overflow-hidden shadow-md border border-gray-200">
-              <Image
-                src="/empire-state-compressed.jpg"
-                alt="City skyline"
-                fill
-                className="object-cover"
-                priority
-                sizes="(min-width:1024px) 560px, 100vw"
-              />
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* ======== Mobile bottom sheet drawer ======== */}
-      <div
-        ref={sheetRef}
-        className="lg:hidden fixed inset-x-0 bottom-0 z-[60]"
-        style={{
-          transform: `translateY(${translateY}px)`,
-          transition: dragging
-            ? "none"
-            : "transform 220ms cubic-bezier(.2,.8,.2,1)",
-        }}
-        onClick={(e) => e.stopPropagation()} // prevent overlay close when tapping sheet
-      >
-        <div className="mx-2 mb-2 rounded-t-[22px] bg-white shadow-[0_-12px_40px_rgba(0,0,0,0.25)] border border-gray-200 overflow-hidden">
-          {/* Header (acts as drag handle) */}
-          <div
-            className="px-4 pt-4 pb-3 border-b border-gray-200"
-            onTouchStart={handleTouchStart}
-            onTouchMove={handleTouchMove}
-            onTouchEnd={handleTouchEnd}
-            onMouseDown={handleMouseDown}
-            role="button"
-            aria-label="Drag to close"
-          >
-            <div className="flex items-center justify-between">
-              <h3
-                className="text-base font-semibold text-gray-900 mx-auto"
-                style={{ fontFamily: "var(--font-dm-sans)" }}
+            {/* Desktop header: back (left), centered title+stepper, close (right) */}
+            <div className="w-full px-5 md:px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+              <button
+                onClick={() => (onBack ? onBack() : onClose())}
+                className="flex items-center gap-2 text-gray-700 hover:text-gray-900"
+                aria-label="Back"
               >
-                Subscription Cancellation
-              </h3>
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M15 19l-7-7 7-7"
+                  />
+                </svg>
+                <span
+                  className="text-sm"
+                  style={{ fontFamily: "var(--font-dm-sans)" }}
+                >
+                  Back
+                </span>
+              </button>
+
+              <div className="flex items-center gap-4">
+                <h3
+                  className="text-base md:text-lg font-semibold text-gray-900"
+                  style={{ fontFamily: "var(--font-dm-sans)" }}
+                >
+                  Subscription Cancellation
+                </h3>
+                <Stepper />
+              </div>
+
               <button
                 onClick={onClose}
-                className="absolute right-4 top-4 text-gray-400 hover:text-gray-600"
+                className="p-1.5 text-gray-400 hover:text-gray-600"
                 aria-label="Close"
               >
                 <svg
@@ -433,93 +319,55 @@ export default function JobFoundModal({ visible, onClose, onBack }: Props) {
               </button>
             </div>
 
-            {/* Stepper row */}
-            <div className="mt-3 flex items-center gap-3">
-              <div className="flex items-center gap-2">
-                {Array.from({ length: TOTAL_STEPS }).map((_, i) => {
-                  const idx = i + 1;
-                  const isActive = idx <= step;
-                  return (
-                    <span
-                      key={idx}
-                      className={[
-                        "h-2 rounded-full transition-colors",
-                        idx === step ? "w-6" : "w-5",
-                        isActive ? "bg-gray-500" : "bg-gray-300",
-                      ].join(" ")}
-                    />
-                  );
-                })}
+            <div className="grid grid-cols-1 lg:grid-cols-[1.1fr_0.9fr] gap-8 p-6 md:p-10">
+              <div className="max-w-[760px]">{step === 1 && <StepOne />}</div>
+
+              <div className="flex items-start justify-center">
+                <div className="relative w-full h-[480px] md:h-[560px] rounded-3xl overflow-hidden shadow-md border border-gray-200">
+                  <Image
+                    src="/empire-state-compressed.jpg"
+                    alt="City skyline"
+                    fill
+                    className="object-cover"
+                    priority
+                    sizes="(min-width:1024px) 560px, 100vw"
+                  />
+                </div>
               </div>
-              <span
-                className="text-sm text-gray-600"
-                style={{ fontFamily: "var(--font-dm-sans)" }}
-              >
-                Step {step} of {TOTAL_STEPS}
-              </span>
             </div>
-          </div>
-
-          {/* Back row */}
-          <div className="px-4 py-3 border-b border-gray-200">
-            <button
-              onClick={() => (onBack ? onBack() : onClose())}
-              className="flex items-center gap-2 text-gray-700 hover:text-gray-900"
-              aria-label="Back"
-            >
-              <svg
-                className="w-5 h-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M15 19l-7-7 7-7"
-                />
-              </svg>
-              <span
-                className="text-sm"
-                style={{ fontFamily: "var(--font-dm-sans)" }}
-              >
-                Back
-              </span>
-            </button>
-          </div>
-
-          {/* Scrollable content */}
-          <div
-            className="max-h-[75vh] overflow-y-auto px-4 pt-4 pb-28"
-            style={{ WebkitOverflowScrolling: "touch" }}
-          >
-            {step === 1 && <StepOne />}
-          </div>
-
-          {/* Sticky bottom action bar */}
-          <div
-            className="absolute inset-x-0 bottom-0 bg-white border-t border-gray-200 px-4 pb-4 pt-3"
-            style={{
-              paddingBottom: "calc(env(safe-area-inset-bottom) + 16px)",
-            }}
-          >
-            <button
-              onClick={onContinue}
-              disabled={!foundVia}
-              className={[
-                "w-full py-3.5 rounded-2xl font-semibold transition-colors",
-                foundVia
-                  ? "bg-[#5D3AF7] text-white hover:bg-[#4F2FF3]"
-                  : "bg-gray-100 text-gray-400 cursor-not-allowed",
-              ].join(" ")}
-              style={{ fontFamily: "var(--font-dm-sans)" }}
-            >
-              Continue
-            </button>
-          </div>
+          </ResponsiveDialog>
         </div>
       </div>
-    </div>
+
+      {/* ======== Mobile drawer ======== */}
+      <MUIDrawer
+        open={visible}
+        onClose={onClose}
+        title="Subscription Cancellation"
+        showGrabHandle={false}
+        headerContent={<Stepper />}
+        backButton={{
+          onBack: onBack ? onBack : onClose,
+          label: "Back",
+        }}
+        stickyFooter={
+          <button
+            onClick={onContinue}
+            disabled={!isStepOneValid}
+            className={[
+              "w-full py-3.5 rounded-2xl font-semibold transition-colors",
+              isStepOneValid
+                ? "bg-[#5D3AF7] text-white hover:bg-[#4F2FF3]"
+                : "bg-gray-100 text-gray-400 cursor-not-allowed",
+            ].join(" ")}
+            style={{ fontFamily: "var(--font-dm-sans)" }}
+          >
+            Continue
+          </button>
+        }
+      >
+        {step === 1 && <StepOne />}
+      </MUIDrawer>
+    </>
   );
 }

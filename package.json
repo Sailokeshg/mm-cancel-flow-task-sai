@@ -11,6 +11,10 @@
     "db:setup": "supabase start && PGPASSWORD=postgres psql -h localhost -p 54322 -U postgres -d postgres -f seed.sql"
   },
   "dependencies": {
+    "@emotion/react": "^11.13.1",
+    "@emotion/styled": "^11.13.0",
+    "@mui/icons-material": "^5.18.0",
+    "@mui/material": "^5.13.7",
     "@supabase/supabase-js": "^2.50.5",
     "next": "15.3.5",
     "react": "^19.0.0",
