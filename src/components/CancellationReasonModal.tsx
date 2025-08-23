@@ -36,6 +36,12 @@ export default function CancellationReasonModal({
         ? maxPrice.trim().length > 0
         : selectedReason === "platform-not-helpful"
         ? feedbackText.trim().length >= 25
+        : selectedReason === "not-enough-jobs"
+        ? feedbackText.trim().length >= 25
+        : selectedReason === "decided-not-to-move"
+        ? feedbackText.trim().length >= 25
+        : selectedReason === "other"
+        ? feedbackText.trim().length >= 25
         : true)
   );
 
@@ -47,6 +53,12 @@ export default function CancellationReasonModal({
         selectedReason === "too-expensive"
           ? `${selectedReason}:${maxPrice}`
           : selectedReason === "platform-not-helpful"
+          ? `${selectedReason}:${feedbackText}`
+          : selectedReason === "not-enough-jobs"
+          ? `${selectedReason}:${feedbackText}`
+          : selectedReason === "decided-not-to-move"
+          ? `${selectedReason}:${feedbackText}`
+          : selectedReason === "other"
           ? `${selectedReason}:${feedbackText}`
           : selectedReason!;
       onSubmit(reasonData);
@@ -145,7 +157,10 @@ export default function CancellationReasonModal({
 
       {/* Radio options; some reasons show only their option with conditional input */}
       {selectedReason !== "platform-not-helpful" &&
-        selectedReason !== "too-expensive" && (
+        selectedReason !== "too-expensive" &&
+        selectedReason !== "not-enough-jobs" &&
+        selectedReason !== "decided-not-to-move" &&
+        selectedReason !== "other" && (
           <p
             className="mt-6 text-[15px] text-red-500"
             style={{ fontFamily: "var(--font-dm-sans)" }}
@@ -194,7 +209,72 @@ export default function CancellationReasonModal({
                 onChange={(e) => setFeedbackText(e.target.value)}
                 className="w-full h-40 p-4 pb-8 rounded-2xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-300 text-gray-800 resize-none"
                 style={{ fontFamily: "var(--font-dm-sans)" }}
-                placeholder="Please enter at least 25 characters so we can understand your feedback"
+              />
+
+              <div className="absolute bottom-3 right-4">
+                <p className="text-sm text-gray-500">
+                  Min 25 characters ({feedbackText.trim().length}/25)
+                </p>
+              </div>
+            </div>
+          </div>
+        </>
+      ) : selectedReason === "not-enough-jobs" ? (
+        <>
+          <div className="mt-6 space-y-4">
+            <RadioOption
+              value="not-enough-jobs"
+              label="Not enough relevant jobs"
+            />
+          </div>
+
+          <div className="mt-2">
+            <p
+              className="text-[15px] text-gray-700 "
+              style={{ fontFamily: "var(--font-dm-sans)" }}
+            >
+              In which way can we make the jobs more relevant?*
+            </p>
+
+            <div className="relative mt-3">
+              <textarea
+                value={feedbackText}
+                onChange={(e) => setFeedbackText(e.target.value)}
+                className="w-full h-40 p-4 pb-8 rounded-2xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-300 text-gray-800 resize-none"
+                style={{ fontFamily: "var(--font-dm-sans)" }}
+              />
+
+              <div className="absolute bottom-3 right-4">
+                <p className="text-sm text-gray-500">
+                  Min 25 characters ({feedbackText.trim().length}/25)
+                </p>
+              </div>
+            </div>
+          </div>
+        </>
+      ) : selectedReason === "decided-not-to-move" ? (
+        <>
+          <div className="mt-6 space-y-4">
+            <RadioOption
+              value="decided-not-to-move"
+              label="Decided not to move"
+            />
+          </div>
+
+          <div className="mt-2">
+            <p
+              className="text-[15px] text-gray-700 "
+              style={{ fontFamily: "var(--font-dm-sans)" }}
+            >
+              What changed for you to decide to not move?*
+            </p>
+
+            <div className="relative mt-3">
+              <textarea
+                value={feedbackText}
+                onChange={(e) => setFeedbackText(e.target.value)}
+                className="w-full h-40 p-4 pb-8 rounded-2xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-300 text-gray-800 resize-none"
+                style={{ fontFamily: "var(--font-dm-sans)" }}
               />
 
               <div className="absolute bottom-3 right-4">
@@ -234,6 +314,36 @@ export default function CancellationReasonModal({
                 style={{ fontFamily: "var(--font-dm-sans)" }}
                 placeholder=""
               />
+            </div>
+          </div>
+        </>
+      ) : selectedReason === "other" ? (
+        <>
+          <div className="mt-6 space-y-4">
+            <RadioOption value="other" label="Other" />
+          </div>
+
+          <div className="mt-2">
+            <p
+              className="text-[15px] text-gray-700 "
+              style={{ fontFamily: "var(--font-dm-sans)" }}
+            >
+              What would have helped you the most?*
+            </p>
+
+            <div className="relative mt-3">
+              <textarea
+                value={feedbackText}
+                onChange={(e) => setFeedbackText(e.target.value)}
+                className="w-full h-40 p-4 pb-8 rounded-2xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-300 text-gray-800 resize-none"
+                style={{ fontFamily: "var(--font-dm-sans)" }}
+              />
+
+              <div className="absolute bottom-3 right-4">
+                <p className="text-sm text-gray-500">
+                  Min 25 characters ({feedbackText.trim().length}/25)
+                </p>
+              </div>
             </div>
           </div>
         </>
