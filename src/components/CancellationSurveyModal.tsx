@@ -7,6 +7,7 @@ import ResponsiveDialog from "./ResponsiveDialog";
 import MUIDrawer from "./MUIDrawer";
 import SubscriptionOfferModal from "./SubscriptionOfferModal";
 import CancellationReasonModal from "./CancellationReasonModal";
+import CancellationFinalModal from "./CancellationFinalModal";
 
 type Props = {
   visible: boolean;
@@ -43,6 +44,8 @@ export default function CancellationSurveyModal({
   const [interviewedCount, setInterviewedCount] = useState<string | null>(null);
   const [showOfferModal, setShowOfferModal] = useState(false);
   const [showReasonModal, setShowReasonModal] = useState(false);
+  const [showFinalModal, setShowFinalModal] = useState(false);
+  const [submittedReason, setSubmittedReason] = useState<string | null>(null);
 
   // Check if all questions are answered
   const isFormValid = Boolean(appliedCount && emailedCount && interviewedCount);
@@ -89,10 +92,10 @@ export default function CancellationSurveyModal({
   };
 
   const handleReasonSubmit = (reason: string) => {
-    if (onNextStep) {
-      onNextStep(reason);
-    }
+    // store reason and show final modal; call onNextStep after final modal closes
+    setSubmittedReason(reason);
     setShowReasonModal(false);
+    setShowFinalModal(true);
   };
 
   const handleReasonBack = () => {
@@ -103,6 +106,16 @@ export default function CancellationSurveyModal({
     if (onAcceptOffer) {
       onAcceptOffer();
     }
+  };
+
+  const handleFinalModalClose = () => {
+    setShowFinalModal(false);
+    // After user closes final modal, notify parent about the completed reason step
+    if (submittedReason && onNextStep) {
+      onNextStep(submittedReason);
+    }
+    setSubmittedReason(null);
+    onClose();
   };
 
   // If the reason modal is showing, render it instead of the survey modal
@@ -120,6 +133,16 @@ export default function CancellationSurveyModal({
     );
   }
 
+  // If the final modal is showing, render it instead of other modals
+  if (showFinalModal) {
+    return (
+      <CancellationFinalModal
+        visible={showFinalModal}
+        onClose={handleFinalModalClose}
+        totalSteps={totalSteps}
+      />
+    );
+  }
   // If the offer modal is showing, render it with proper z-index and hide the main modal
   if (showOfferModal) {
     return (

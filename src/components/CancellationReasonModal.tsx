@@ -11,6 +11,7 @@ type Props = {
   onBack?: () => void;
   onSubmit?: (reason: string) => void;
   onAcceptOffer?: () => void; // For the discount offer
+  onShowFinalModal?: () => void; // Callback to ask parent to show the final modal
   step?: number;
   totalSteps?: number;
 };
@@ -21,6 +22,7 @@ export default function CancellationReasonModal({
   onBack,
   onSubmit,
   onAcceptOffer,
+  onShowFinalModal,
   step = 3,
   totalSteps = 3,
 }: Props) {
@@ -62,6 +64,8 @@ export default function CancellationReasonModal({
           ? `${selectedReason}:${feedbackText}`
           : selectedReason!;
       onSubmit(reasonData);
+      // Ask parent to show the final modal (parent should hide this modal)
+      if (onShowFinalModal) onShowFinalModal();
     }
   };
 
