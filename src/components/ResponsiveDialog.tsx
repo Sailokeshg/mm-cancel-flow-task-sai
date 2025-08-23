@@ -6,7 +6,6 @@ import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
 import useMediaQuery from "@mui/material/useMediaQuery";
-import { useTheme } from "@mui/material/styles";
 
 type Props = {
   open: boolean;
@@ -17,6 +16,8 @@ type Props = {
   maxWidth?: false | "xs" | "sm" | "md" | "lg" | "xl";
   fullWidth?: boolean;
   paperSx?: any;
+  /** If true, don't render at all below 1024px (prevents portal on mobile). */
+  desktopOnly?: boolean;
 };
 
 export default function ResponsiveDialog({
@@ -28,21 +29,26 @@ export default function ResponsiveDialog({
   maxWidth = "lg",
   fullWidth = true,
   paperSx,
+  desktopOnly = false,
 }: Props) {
-  const theme = useTheme();
-  const fullScreen = useMediaQuery(theme.breakpoints.down("lg"));
+  // Tailwind-aligned breakpoints
+  const isDesktop = useMediaQuery("(min-width:1024px)");
+  const isMobile = !isDesktop;
+
+  // If asked to be desktop-only, don't mount on mobile (prevents portal)
+  if (desktopOnly && !isDesktop) return null;
 
   return (
     <Dialog
       open={open}
       onClose={onClose}
-      fullScreen={fullScreen}
+      fullScreen={isMobile} // fullscreen only under 1024px
       fullWidth={fullWidth}
       maxWidth={maxWidth}
       PaperProps={{
         sx: {
-          borderRadius: fullScreen ? 0 : 3,
-          m: fullScreen ? 0 : 2,
+          borderRadius: isMobile ? 0 : 3,
+          m: isMobile ? 0 : 2,
           overflow: "hidden",
           ...paperSx,
         },

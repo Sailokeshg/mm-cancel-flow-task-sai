@@ -6,7 +6,7 @@ import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import IconButton from "@mui/material/IconButton";
 import useMediaQuery from "@mui/material/useMediaQuery";
-import { styled, useTheme } from "@mui/material/styles";
+import { styled } from "@mui/material/styles";
 import CloseIcon from "@mui/icons-material/Close";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 
@@ -16,70 +16,48 @@ interface MUIDrawerProps {
   onOpen?: () => void;
   title: string;
   children: React.ReactNode;
-  headerContent?: React.ReactNode; // Additional content in header (like stepper)
-  backButton?: {
-    onBack: () => void;
-    label?: string;
-  };
+  headerContent?: React.ReactNode;
+  backButton?: { onBack: () => void; label?: string };
   stickyFooter?: React.ReactNode;
   showGrabHandle?: boolean;
-  maxHeight?: string;
+  maxHeight?: string; // e.g. "min(75dvh,75vh)"
 }
 
-// Styled components for custom styling
-const StyledPaper = styled("div")(({ theme }) => ({
-  borderTopLeftRadius: 28,
-  borderTopRightRadius: 28,
-  backgroundColor: "white",
-  height: "75vh", // Fixed height to match Figma
-  maxHeight: "75vh",
-  display: "flex",
-  flexDirection: "column",
-  overflow: "hidden",
-}));
+/** Tailwind‑aligned breakpoint: mobile = < 1024px */
+const useIsMobile = () => useMediaQuery("(max-width: 1023.98px)");
 
 const GrabHandle = styled("div")(() => ({
-  width: 48,
-  height: 6,
-  backgroundColor: "#9CA3AF", // gray-400 - more visible
-  borderRadius: 3,
-  margin: "12px auto 8px auto",
-  cursor: "grab",
-  "&:active": {
-    cursor: "grabbing",
-  },
+  width: 44,
+  height: 5,
+  backgroundColor: "rgba(17, 24, 39, 0.18)",
+  borderRadius: 999,
+  margin: "10px auto 6px auto",
 }));
 
-const HeaderContainer = styled(Box)(() => ({
-  padding: "12px 16px",
-  borderBottom: "1px solid #E5E7EB", // gray-200
+const Header = styled(Box)(() => ({
+  padding: "12px 20px",
+  borderBottom: "1px solid #E5E7EB",
   display: "flex",
   alignItems: "center",
-  justifyContent: "center",
+  justifyContent: "flex-start",
   position: "relative",
-  minHeight: 48,
+  minHeight: 52,
 }));
 
-const ContentContainer = styled(Box)(() => ({
+const Content = styled(Box)(() => ({
   flex: 1,
   overflow: "auto",
-  padding: "16px",
-  paddingBottom: "32px", // Extra padding for sticky footer
+  padding: "16px 20px 24px 20px",
   WebkitOverflowScrolling: "touch",
 }));
 
-const StickyFooter = styled(Box)(() => ({
+const Footer = styled(Box)(() => ({
   position: "sticky",
   bottom: 0,
   backgroundColor: "white",
-  borderTop: "1px solid #E5E7EB", // gray-200
-  padding: "12px 16px 16px 16px",
+  borderTop: "1px solid #E5E7EB",
+  padding: "12px 20px",
   paddingBottom: "calc(env(safe-area-inset-bottom) + 16px)",
-}));
-
-const BackButtonContainer = styled(Box)(() => ({
-  padding: "12px 16px",
-  borderBottom: "1px solid #E5E7EB", // gray-200
 }));
 
 export default function MUIDrawer({
@@ -92,19 +70,17 @@ export default function MUIDrawer({
   backButton,
   stickyFooter,
   showGrabHandle = true,
-  maxHeight = "90vh",
+  maxHeight = "min(75dvh,75vh)",
 }: MUIDrawerProps) {
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("lg"));
-  
-  // Detect iOS for performance optimizations
-  const iOS =
-    typeof navigator !== "undefined" && /iPad|iPhone|iPod/.test(navigator.userAgent);
+  const isMobile = useIsMobile();
 
-  // Don't render on desktop - only show on mobile
-  if (!isMobile) {
-    return null;
-  }
+  // Only render on mobile; desktop uses your dialog
+  if (!isMobile) return null;
+
+  // iOS perf flags (optional)
+  const iOS =
+    typeof navigator !== "undefined" &&
+    /iPad|iPhone|iPod/.test(navigator.userAgent);
 
   return (
     <SwipeableDrawer
@@ -114,125 +90,103 @@ export default function MUIDrawer({
       onOpen={onOpen}
       disableBackdropTransition={!iOS}
       disableDiscovery={iOS}
-      variant="temporary"
       ModalProps={{
         keepMounted: true,
-        sx: {
-          "& .MuiBackdrop-root": {
-            backgroundColor: "rgba(0, 0, 0, 0.3)",
-          },
-        },
+        sx: { "& .MuiBackdrop-root": { backgroundColor: "rgba(0,0,0,0.35)" } },
       }}
       PaperProps={{
         sx: {
-          backgroundColor: "transparent",
-          boxShadow: "none",
+          alignSelf: "flex-end",
+          borderTopLeftRadius: 28,
+          borderTopRightRadius: 28,
+          backgroundColor: "white",
+          boxShadow: "0 -20px 60px rgba(0,0,0,0.25)",
+          border: "1px solid #E5E7EB",
           height: "auto",
-          maxHeight: "75vh", // Reduced from 90vh to match Figma
-          overflow: "visible",
+          maxHeight,
+          overflow: "hidden",
         },
       }}
       sx={{
         "& .MuiDrawer-paper": {
-          backgroundColor: "transparent",
-          boxShadow: "none",
+          alignSelf: "flex-end",
           height: "auto",
-          maxHeight: "75vh",
-          overflow: "visible",
+          maxHeight,
+          overflow: "hidden",
         },
       }}
     >
-      <Box sx={{ mx: 1, mb: 1 }}>
-        <StyledPaper
-          sx={{
-            height: "75vh", // Fixed height to match Figma
-            boxShadow: "0 -12px 40px rgba(0,0,0,0.25)",
-            border: "1px solid #E5E7EB",
-          }}
-        >
-          {/* Grab handle */}
-          {showGrabHandle && <GrabHandle />}
+      <Box
+        sx={{ display: "flex", flexDirection: "column", maxHeight: "inherit" }}
+      >
+        {showGrabHandle && <GrabHandle />}
 
-          {/* Header */}
-          <HeaderContainer>
-            <Typography
-              variant="h6"
-              component="h3"
+        <Header>
+          <Typography
+            variant="h6"
+            component="h3"
+            sx={{
+              fontFamily: "var(--font-dm-sans)",
+              fontWeight: 700,
+              fontSize: "20px",
+              letterSpacing: "-0.01em",
+              color: "#111827",
+            }}
+          >
+            {title}
+          </Typography>
+
+          <IconButton
+            onClick={onClose}
+            sx={{
+              position: "absolute",
+              right: 8,
+              top: "50%",
+              transform: "translateY(-50%)",
+              color: "#6B7280",
+              "&:hover": { color: "#374151" },
+            }}
+            aria-label="Close"
+          >
+            <CloseIcon />
+          </IconButton>
+        </Header>
+
+        {headerContent && (
+          <Box sx={{ px: 2, py: 1.25, borderBottom: "1px solid #E5E7EB" }}>
+            {headerContent}
+          </Box>
+        )}
+
+        {backButton && (
+          <Box sx={{ px: 2.5, py: 1.25, borderBottom: "1px solid #E5E7EB" }}>
+            <Box
+              component="button"
+              onClick={backButton.onBack}
               sx={{
+                display: "flex",
+                alignItems: "center",
+                gap: 1,
+                background: "none",
+                border: "none",
+                color: "#374151",
+                cursor: "pointer",
+                padding: 0,
                 fontFamily: "var(--font-dm-sans)",
-                fontWeight: 600,
-                fontSize: "16px",
-                color: "#111827", // gray-900
-                textAlign: "center",
-                flex: 1,
+                fontSize: "14px",
+                "&:hover": { color: "#111827" },
               }}
+              aria-label="Back"
             >
-              {title}
-            </Typography>
-            <IconButton
-              onClick={onClose}
-              sx={{
-                position: "absolute",
-                right: 8,
-                top: "50%",
-                transform: "translateY(-50%)",
-                color: "#9CA3AF", // gray-400
-                "&:hover": {
-                  color: "#4B5563", // gray-600
-                },
-              }}
-              aria-label="Close"
-            >
-              <CloseIcon />
-            </IconButton>
-          </HeaderContainer>
+              <ArrowBackIcon sx={{ fontSize: 20 }} />
+              {backButton.label || "Back"}
+            </Box>
+          </Box>
+        )}
 
-          {/* Additional header content (like stepper) */}
-          {headerContent && (
-            <>
-              <Box sx={{ px: 2, py: 1.5, borderBottom: "1px solid #E5E7EB" }}>
-                {headerContent}
-              </Box>
-            </>
-          )}
+        <Content sx={{ pb: stickyFooter ? 10 : 4 }}>{children}</Content>
 
-          {/* Back button */}
-          {backButton && (
-            <BackButtonContainer>
-              <Box
-                component="button"
-                onClick={backButton.onBack}
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 1,
-                  background: "none",
-                  border: "none",
-                  color: "#374151", // gray-700
-                  cursor: "pointer",
-                  padding: 0,
-                  fontFamily: "var(--font-dm-sans)",
-                  fontSize: "14px",
-                  "&:hover": {
-                    color: "#111827", // gray-900
-                  },
-                }}
-                aria-label="Back"
-              >
-                <ArrowBackIcon sx={{ fontSize: 20 }} />
-                {backButton.label || "Back"}
-              </Box>
-            </BackButtonContainer>
-          )}
-
-          {/* Scrollable content */}
-          <ContentContainer sx={{ pb: stickyFooter ? 10 : 4 }}>
-            {children}
-          </ContentContainer>
-
-          {/* Sticky footer */}
-          {stickyFooter && <StickyFooter>{stickyFooter}</StickyFooter>}
-        </StyledPaper>
+        {stickyFooter && <Footer>{stickyFooter}</Footer>}
       </Box>
     </SwipeableDrawer>
   );
