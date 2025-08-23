@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import Image from "next/image";
+import useMediaQuery from "@mui/material/useMediaQuery";
 import ResponsiveDialog from "./ResponsiveDialog";
 import MUIDrawer from "./MUIDrawer";
 
@@ -10,8 +11,8 @@ type Props = {
   onClose: () => void;
   onBack?: () => void;
   onSubmit?: (reason: string) => void;
-  onAcceptOffer?: () => void; // For the discount offer
-  onShowFinalModal?: () => void; // Callback to ask parent to show the final modal
+  onAcceptOffer?: () => void;
+  onShowFinalModal?: () => void;
   step?: number;
   totalSteps?: number;
 };
@@ -26,12 +27,13 @@ export default function CancellationReasonModal({
   step = 3,
   totalSteps = 3,
 }: Props) {
-  // ======= Form state =======
+  // ------- state -------
   const [selectedReason, setSelectedReason] = useState<string | null>(null);
   const [maxPrice, setMaxPrice] = useState<string>("");
   const [feedbackText, setFeedbackText] = useState<string>("");
 
-  // Check if a reason is selected and any conditional fields are valid
+  const isDesktop = useMediaQuery("(min-width:1024px)");
+
   const isFormValid = Boolean(
     selectedReason &&
       (selectedReason === "too-expensive"
@@ -49,35 +51,32 @@ export default function CancellationReasonModal({
 
   if (!visible) return null;
 
+  // ------- handlers -------
   const handleContinue = () => {
-    if (isFormValid && onSubmit) {
-      const reasonData =
-        selectedReason === "too-expensive"
-          ? `${selectedReason}:${maxPrice}`
-          : selectedReason === "platform-not-helpful"
-          ? `${selectedReason}:${feedbackText}`
-          : selectedReason === "not-enough-jobs"
-          ? `${selectedReason}:${feedbackText}`
-          : selectedReason === "decided-not-to-move"
-          ? `${selectedReason}:${feedbackText}`
-          : selectedReason === "other"
-          ? `${selectedReason}:${feedbackText}`
-          : selectedReason!;
-      onSubmit(reasonData);
-      // Ask parent to show the final modal (parent should hide this modal)
-      if (onShowFinalModal) onShowFinalModal();
-    }
+    if (!isFormValid || !onSubmit) return;
+
+    const reasonData =
+      selectedReason === "too-expensive"
+        ? `${selectedReason}:${maxPrice}`
+        : selectedReason === "platform-not-helpful"
+        ? `${selectedReason}:${feedbackText}`
+        : selectedReason === "not-enough-jobs"
+        ? `${selectedReason}:${feedbackText}`
+        : selectedReason === "decided-not-to-move"
+        ? `${selectedReason}:${feedbackText}`
+        : selectedReason === "other"
+        ? `${selectedReason}:${feedbackText}`
+        : selectedReason!;
+
+    onSubmit(reasonData);
+    onShowFinalModal?.();
   };
 
-  const handleAcceptOffer = () => {
-    if (onAcceptOffer) {
-      onAcceptOffer();
-    }
-  };
+  const handleAcceptOffer = () => onAcceptOffer?.();
 
-  // ======= Stepper UI =======
+  // ------- Stepper -------
   const Stepper = () => (
-    <div className="flex items-center gap-3">
+    <div className="flex items-center justify-start gap-3">
       <div className="flex items-center gap-2">
         {Array.from({ length: totalSteps }).map((_, i) => {
           const idx = i + 1;
@@ -108,7 +107,7 @@ export default function CancellationReasonModal({
     </div>
   );
 
-  // ======= Radio button component =======
+  // ------- Radio -------
   const RadioOption = ({ value, label }: { value: string; label: string }) => (
     <label className="flex items-center gap-3 cursor-pointer group">
       <div className="relative">
@@ -129,7 +128,7 @@ export default function CancellationReasonModal({
           ].join(" ")}
         >
           {selectedReason === value && (
-            <div className="w-2 h-2 rounded-full bg-white absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" />
+            <div className="w-2 h-2 rounded-full bg-white absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
           )}
         </div>
       </div>
@@ -142,63 +141,24 @@ export default function CancellationReasonModal({
     </label>
   );
 
-  // ======= Main content =======
-  const Content = () => (
-    <>
-      <h2
-        className="text-[36px] md:text-[36px] font-semibold text-gray-800 leading-snug"
-        style={{ fontFamily: "var(--font-dm-sans)" }}
-      >
-        What&apos;s the main reason for cancelling?
-      </h2>
-
-      <p
-        className="mt-1 text-[16px] text-gray-700"
-        style={{ fontFamily: "var(--font-dm-sans)" }}
-      >
-        Please take a minute to let us know why:
-      </p>
-
-      {/* Radio options; some reasons show only their option with conditional input */}
-      {selectedReason !== "platform-not-helpful" &&
-        selectedReason !== "too-expensive" &&
-        selectedReason !== "not-enough-jobs" &&
-        selectedReason !== "decided-not-to-move" &&
-        selectedReason !== "other" && (
-          <p
-            className="mt-6 text-[15px] text-red-500"
-            style={{ fontFamily: "var(--font-dm-sans)" }}
-          >
-            To help us understand your experience, please select a reason for
-            cancelling*
-          </p>
-        )}
-
-      {/* If platform-not-helpful selected, only show that option plus textarea */}
-      {selectedReason === "platform-not-helpful" ? (
+  // ------- Shared dynamic blocks (used by both desktop & mobile) -------
+  const DynamicBlocks = () => {
+    if (selectedReason === "platform-not-helpful") {
+      return (
         <>
           <div className="mt-6 space-y-4">
-            <RadioOption
-              value="platform-not-helpful"
-              label="Platform not helpful"
-            />
+            <RadioOption value="platform-not-helpful" label="Platform not helpful" />
           </div>
 
           <div className="mt-2">
-            <p
-              className="text-[15px] text-gray-700 "
-              style={{ fontFamily: "var(--font-dm-sans)" }}
-            >
+            <p className="text-[15px] text-gray-700" style={{ fontFamily: "var(--font-dm-sans)" }}>
               What can we change to make the platform more helpful?*
             </p>
 
-            {/* validation message moved to top-right under the question */}
-            <div className=" flex justify-start">
+            <div className="flex justify-start">
               <p
                 className={`text-sm ${
-                  feedbackText.trim().length < 25
-                    ? "text-red-500"
-                    : "text-gray-500"
+                  feedbackText.trim().length < 25 ? "text-red-500" : "text-gray-500"
                 }`}
               >
                 {feedbackText.trim().length < 25
@@ -214,7 +174,6 @@ export default function CancellationReasonModal({
                 className="w-full h-40 p-4 pb-8 rounded-2xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-300 text-gray-800 resize-none"
                 style={{ fontFamily: "var(--font-dm-sans)" }}
               />
-
               <div className="absolute bottom-3 right-4">
                 <p className="text-sm text-gray-500">
                   Min 25 characters ({feedbackText.trim().length}/25)
@@ -223,20 +182,18 @@ export default function CancellationReasonModal({
             </div>
           </div>
         </>
-      ) : selectedReason === "not-enough-jobs" ? (
+      );
+    }
+
+    if (selectedReason === "not-enough-jobs") {
+      return (
         <>
           <div className="mt-6 space-y-4">
-            <RadioOption
-              value="not-enough-jobs"
-              label="Not enough relevant jobs"
-            />
+            <RadioOption value="not-enough-jobs" label="Not enough relevant jobs" />
           </div>
 
           <div className="mt-2">
-            <p
-              className="text-[15px] text-gray-700 "
-              style={{ fontFamily: "var(--font-dm-sans)" }}
-            >
+            <p className="text-[15px] text-gray-700" style={{ fontFamily: "var(--font-dm-sans)" }}>
               In which way can we make the jobs more relevant?*
             </p>
 
@@ -247,7 +204,6 @@ export default function CancellationReasonModal({
                 className="w-full h-40 p-4 pb-8 rounded-2xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-300 text-gray-800 resize-none"
                 style={{ fontFamily: "var(--font-dm-sans)" }}
               />
-
               <div className="absolute bottom-3 right-4">
                 <p className="text-sm text-gray-500">
                   Min 25 characters ({feedbackText.trim().length}/25)
@@ -256,20 +212,18 @@ export default function CancellationReasonModal({
             </div>
           </div>
         </>
-      ) : selectedReason === "decided-not-to-move" ? (
+      );
+    }
+
+    if (selectedReason === "decided-not-to-move") {
+      return (
         <>
           <div className="mt-6 space-y-4">
-            <RadioOption
-              value="decided-not-to-move"
-              label="Decided not to move"
-            />
+            <RadioOption value="decided-not-to-move" label="Decided not to move" />
           </div>
 
           <div className="mt-2">
-            <p
-              className="text-[15px] text-gray-700 "
-              style={{ fontFamily: "var(--font-dm-sans)" }}
-            >
+            <p className="text-[15px] text-gray-700" style={{ fontFamily: "var(--font-dm-sans)" }}>
               What changed for you to decide to not move?*
             </p>
 
@@ -280,7 +234,6 @@ export default function CancellationReasonModal({
                 className="w-full h-40 p-4 pb-8 rounded-2xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-300 text-gray-800 resize-none"
                 style={{ fontFamily: "var(--font-dm-sans)" }}
               />
-
               <div className="absolute bottom-3 right-4">
                 <p className="text-sm text-gray-500">
                   Min 25 characters ({feedbackText.trim().length}/25)
@@ -289,23 +242,23 @@ export default function CancellationReasonModal({
             </div>
           </div>
         </>
-      ) : selectedReason === "too-expensive" ? (
+      );
+    }
+
+    if (selectedReason === "too-expensive") {
+      return (
         <>
           <div className="mt-6 space-y-4">
             <RadioOption value="too-expensive" label="Too expensive" />
           </div>
 
-          {/* Conditional input for "too expensive" */}
           <div className="mt-6">
-            <p
-              className="text-[15px] text-gray-700 mb-3"
-              style={{ fontFamily: "var(--font-dm-sans)" }}
-            >
+            <p className="text-[15px] text-gray-700 mb-3" style={{ fontFamily: "var(--font-dm-sans)" }}>
               What would be the maximum you would be willing to pay?*
             </p>
             <div className="relative">
               <span
-                className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500 text-[15px]"
+                className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 text-[15px]"
                 style={{ fontFamily: "var(--font-dm-sans)" }}
               >
                 $
@@ -316,22 +269,22 @@ export default function CancellationReasonModal({
                 onChange={(e) => setMaxPrice(e.target.value)}
                 className="w-full pl-8 pr-4 py-3 rounded-2xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:border-gray-300 text-gray-800"
                 style={{ fontFamily: "var(--font-dm-sans)" }}
-                placeholder=""
               />
             </div>
           </div>
         </>
-      ) : selectedReason === "other" ? (
+      );
+    }
+
+    if (selectedReason === "other") {
+      return (
         <>
           <div className="mt-6 space-y-4">
             <RadioOption value="other" label="Other" />
           </div>
 
           <div className="mt-2">
-            <p
-              className="text-[15px] text-gray-700 "
-              style={{ fontFamily: "var(--font-dm-sans)" }}
-            >
+            <p className="text-[15px] text-gray-700" style={{ fontFamily: "var(--font-dm-sans)" }}>
               What would have helped you the most?*
             </p>
 
@@ -342,7 +295,6 @@ export default function CancellationReasonModal({
                 className="w-full h-40 p-4 pb-8 rounded-2xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-300 text-gray-800 resize-none"
                 style={{ fontFamily: "var(--font-dm-sans)" }}
               />
-
               <div className="absolute bottom-3 right-4">
                 <p className="text-sm text-gray-500">
                   Min 25 characters ({feedbackText.trim().length}/25)
@@ -351,27 +303,48 @@ export default function CancellationReasonModal({
             </div>
           </div>
         </>
-      ) : (
-        <div className="mt-6 space-y-4">
-          <RadioOption value="too-expensive" label="Too expensive" />
-          <RadioOption
-            value="platform-not-helpful"
-            label="Platform not helpful"
-          />
-          <RadioOption
-            value="not-enough-jobs"
-            label="Not enough relevant jobs"
-          />
-          <RadioOption
-            value="decided-not-to-move"
-            label="Decided not to move"
-          />
-          <RadioOption value="other" label="Other" />
-        </div>
+      );
+    }
+
+    // initial list
+    return (
+      <div className="mt-6 space-y-4">
+        <RadioOption value="too-expensive" label="Too expensive" />
+        <RadioOption value="platform-not-helpful" label="Platform not helpful" />
+        <RadioOption value="not-enough-jobs" label="Not enough relevant jobs" />
+        <RadioOption value="decided-not-to-move" label="Decided not to move" />
+        <RadioOption value="other" label="Other" />
+      </div>
+    );
+  };
+
+  // ------- Desktop content -------
+  const ContentDesktop = () => (
+    <>
+      <h2
+        className="text-[36px] font-semibold text-gray-800 leading-snug"
+        style={{ fontFamily: "var(--font-dm-sans)" }}
+      >
+        What&apos;s the main reason for cancelling?
+      </h2>
+
+      <p className="mt-1 text-[16px] text-gray-700" style={{ fontFamily: "var(--font-dm-sans)" }}>
+        Please take a minute to let us know why:
+      </p>
+
+      {/* initial validation message on desktop only shows when none picked */}
+      {!selectedReason && (
+        <p
+          className="mt-6 text-[15px] text-red-500"
+          style={{ fontFamily: "var(--font-dm-sans)" }}
+        >
+          To help us understand your experience, please select a reason for cancelling*
+        </p>
       )}
 
+      <DynamicBlocks />
+
       <div className="mt-8">
-        {/* Discount offer button */}
         <button
           onClick={handleAcceptOffer}
           className="w-full py-3.5 rounded-2xl font-semibold text-white bg-[#28B463] hover:bg-[#24A259] transition-colors flex items-center justify-center gap-2"
@@ -383,7 +356,6 @@ export default function CancellationReasonModal({
           <span className="text-sm line-through text-green-200 ml-1">$25</span>
         </button>
 
-        {/* Continue button - show on desktop */}
         <button
           onClick={handleContinue}
           disabled={!isFormValid}
@@ -401,17 +373,44 @@ export default function CancellationReasonModal({
     </>
   );
 
+  // ------- Mobile content (matches Figma) -------
+  const ContentMobile = () => (
+    <>
+      <h2
+        className="text-[28px] font-semibold text-gray-800 leading-snug"
+        style={{ fontFamily: "var(--font-dm-sans)" }}
+      >
+        What’s the main reason for cancelling?
+      </h2>
+
+      <p className="mt-1 text-[15px] text-gray-700" style={{ fontFamily: "var(--font-dm-sans)" }}>
+        Please take a minute to let us know why:
+      </p>
+
+      {/* thin divider */}
+      <div className="mt-3 mb-3 h-px bg-gray-200" />
+
+      {/* red validation note right under divider until a reason is chosen */}
+      {!selectedReason && (
+        <p className="text-[15px] text-red-500" style={{ fontFamily: "var(--font-dm-sans)" }}>
+          To help us understand your experience, please select a reason for cancelling*
+        </p>
+      )}
+
+      <DynamicBlocks />
+    </>
+  );
+
   return (
     <>
-      {/* ======== Desktop dialog (MUI) ======== */}
-      <div className="hidden lg:block">
+      {/* ===== Desktop (>=1024px) ===== */}
+      {isDesktop && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/30"
           role="dialog"
           aria-modal="true"
           aria-labelledby="reason-title"
           onClick={(e) => {
-            // click outside closes
             if (e.target === e.currentTarget) onClose();
           }}
         >
@@ -421,70 +420,48 @@ export default function CancellationReasonModal({
             maxWidth="lg"
             fullWidth
             paperSx={{ borderRadius: 6 }}
-          >
-            {/* Desktop header: back (left), centered title+stepper, close (right) */}
-            <div className="w-full px-5 md:px-6 py-4 border-b border-gray-200 flex items-center justify-between">
-              <button
-                onClick={() => (onBack ? onBack() : onClose())}
-                className="flex items-center gap-2 text-gray-700 hover:text-gray-900"
-                aria-label="Back"
-              >
-                <svg
-                  className="w-5 h-5"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
+            desktopOnly
+            title={
+              <div className="flex items-center justify-between w-full">
+                <button
+                  onClick={() => (onBack ? onBack() : onClose())}
+                  className="flex items-center gap-2 text-gray-700 hover:text-gray-900"
+                  aria-label="Back"
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M15 19l-7-7 7-7"
-                  />
-                </svg>
-                <span
-                  className="text-sm"
-                  style={{ fontFamily: "var(--font-dm-sans)" }}
-                >
-                  Back
-                </span>
-              </button>
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                  </svg>
+                  <span className="text-sm" style={{ fontFamily: "var(--font-dm-sans)" }}>
+                    Back
+                  </span>
+                </button>
 
-              <div className="flex items-center gap-4">
-                <h3
-                  id="reason-title"
-                  className="text-base md:text-lg font-semibold text-gray-900"
-                  style={{ fontFamily: "var(--font-dm-sans)" }}
+                <div className="flex items-center gap-4">
+                  <h3
+                    id="reason-title"
+                    className="text-base md:text-lg font-semibold text-gray-900"
+                    style={{ fontFamily: "var(--font-dm-sans)" }}
+                  >
+                    Subscription Cancellation
+                  </h3>
+                  <Stepper />
+                </div>
+
+                <button
+                  onClick={onClose}
+                  className="p-1.5 text-gray-400 hover:text-gray-600"
+                  aria-label="Close"
                 >
-                  Subscription Cancellation
-                </h3>
-                <Stepper />
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
               </div>
-
-              <button
-                onClick={onClose}
-                className="p-1.5 text-gray-400 hover:text-gray-600"
-                aria-label="Close"
-              >
-                <svg
-                  className="w-6 h-6"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                </svg>
-              </button>
-            </div>
-
+            }
+          >
             <div className="grid grid-cols-1 lg:grid-cols-[1.1fr_0.9fr] gap-8 p-6 md:p-10">
               <div className="max-w-[760px]">
-                <Content />
+                <ContentDesktop />
               </div>
 
               <div className="flex items-start justify-center">
@@ -502,51 +479,49 @@ export default function CancellationReasonModal({
             </div>
           </ResponsiveDialog>
         </div>
-      </div>
+      )}
 
-      {/* ======== Mobile drawer ======== */}
-      <MUIDrawer
-        open={visible}
-        onClose={onClose}
-        title="Subscription Cancellation"
-        showGrabHandle={false}
-        headerContent={<Stepper />}
-        backButton={{
-          onBack: onBack ? onBack : onClose,
-          label: "Back",
-        }}
-        stickyFooter={
-          <div className="space-y-3">
-            <button
-              onClick={handleAcceptOffer}
-              className="w-full py-3.5 rounded-2xl font-semibold text-white bg-[#28B463] hover:bg-[#24A259] transition-colors flex items-center justify-center gap-2"
-              style={{ fontFamily: "var(--font-dm-sans)" }}
-            >
-              <span>Get 50% off</span>
-              <span className="text-lg">|</span>
-              <span className="text-lg font-bold">$12.50</span>
-              <span className="text-sm line-through text-green-200 ml-1">
-                $25
-              </span>
-            </button>
-            <button
-              onClick={handleContinue}
-              disabled={!isFormValid}
-              className={[
-                "w-full py-3.5 rounded-2xl font-semibold transition-colors",
-                isFormValid
-                  ? "bg-gray-100 text-gray-500 hover:bg-gray-200 border border-gray-200"
-                  : "bg-gray-100 text-gray-400 border border-gray-200 cursor-not-allowed",
-              ].join(" ")}
-              style={{ fontFamily: "var(--font-dm-sans)" }}
-            >
-              Complete cancellation
-            </button>
-          </div>
-        }
-      >
-        <Content />
-      </MUIDrawer>
+      {/* ===== Mobile (<1024px) ===== */}
+      {!isDesktop && (
+        <MUIDrawer
+          open={visible}
+          onClose={onClose}
+          title="Subscription Cancellation"
+          showGrabHandle={false}
+          headerContent={<Stepper />}
+          backButton={{ onBack: onBack ? onBack : onClose, label: "Back" }}
+          maxHeight="min(75dvh,75vh)"
+          stickyFooter={
+            <div className="space-y-3">
+              <button
+                onClick={handleAcceptOffer}
+                className="w-full h-[56px] rounded-2xl font-semibold text-white bg-[#28B463] hover:bg-[#24A259] transition-colors flex items-center justify-center gap-2"
+                style={{ fontFamily: "var(--font-dm-sans)" }}
+              >
+                <span>Get 50% off</span>
+                <span className="text-lg">|</span>
+                <span className="text-lg font-bold">$12.50</span>
+                <span className="text-sm line-through text-green-200 ml-1">$25</span>
+              </button>
+              <button
+                onClick={handleContinue}
+                disabled={!isFormValid}
+                className={[
+                  "w-full h-[56px] rounded-2xl font-semibold transition-colors",
+                  isFormValid
+                    ? "bg-gray-100 text-gray-500 hover:bg-gray-200 border border-gray-200"
+                    : "bg-gray-100 text-gray-400 border border-gray-200 cursor-not-allowed",
+                ].join(" ")}
+                style={{ fontFamily: "var(--font-dm-sans)" }}
+              >
+                Complete cancellation
+              </button>
+            </div>
+          }
+        >
+          <ContentMobile />
+        </MUIDrawer>
+      )}
     </>
   );
 }
