@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
+import useMediaQuery from "@mui/material/useMediaQuery";
 import OptionButton from "./OptionButton";
 import CancellationFeedbackModal from "./CancellationFeedbackModal";
 import CancellationVisaSupportModal from "./CancellationVisaSupportModel";
@@ -15,20 +16,23 @@ type Props = {
 };
 
 export default function JobFoundModal({ visible, onClose, onBack }: Props) {
+  // Desktop breakpoint aligned with Tailwind `lg`
+  const isDesktop = useMediaQuery("(min-width:1024px)");
+
   // ======= Steps (3 total as per Figma) =======
   const TOTAL_STEPS = 3;
   const [step, setStep] = useState(1);
   const [foundVia, setFoundVia] = useState<string | null>(null);
 
   const goToStep = (n: number) =>
-    setStep(Math.min(Math.max(n, 1), TOTAL_STEPS)); // Handles 3 steps
+    setStep(Math.min(Math.max(n, 1), TOTAL_STEPS));
 
   // ======= Form state (Step 1) =======
   const [appliedCount, setAppliedCount] = useState<string | null>(null);
   const [emailedCount, setEmailedCount] = useState<string | null>(null);
   const [interviewedCount, setInterviewedCount] = useState<string | null>(null);
 
-  // Reset to step 1 and clear form when modal becomes visible
+  // Reset on open
   useEffect(() => {
     if (visible) {
       setStep(1);
@@ -39,24 +43,20 @@ export default function JobFoundModal({ visible, onClose, onBack }: Props) {
     }
   }, [visible]);
 
-  // validity for step 1: require answers for all questions
   const isStepOneValid = Boolean(
     foundVia && appliedCount && emailedCount && interviewedCount
   );
 
   if (!visible) return null;
 
-  // When the user advances to step 2, render the feedback modal only to avoid
-  // stacking the JobFoundModal UI underneath it (causes the mobile overlap).
+  // Step 2 & 3 are separate modals (to avoid stacking UI underneath)
   if (step === 2) {
     return (
       <CancellationFeedbackModal
-        visible={true}
+        visible
         onBack={() => goToStep(1)}
         onClose={onClose}
-        onSubmit={(feedback) => {
-          console.log("cancellation feedback:", feedback);
-          // Always go to step 3 (visa support) regardless of MigrateMate answer
+        onSubmit={() => {
           goToStep(3);
         }}
         totalSteps={TOTAL_STEPS}
@@ -64,36 +64,28 @@ export default function JobFoundModal({ visible, onClose, onBack }: Props) {
     );
   }
 
-  // When the user advances to step 3, render the visa support modal
-  // Show visa support modal for both "Yes" and "No" answers, but with different text
   if (step === 3) {
     return (
       <CancellationVisaSupportModal
-        visible={true}
+        visible
         onBack={() => goToStep(2)}
         onClose={onClose}
-        onComplete={(companyProvidesLawyer) => {
-          console.log("Company provides lawyer:", companyProvidesLawyer);
-          // After step 3 completes, close and let parent handle completion modal
+        onComplete={() => {
           onClose();
         }}
-        foundViaYes={foundVia === "yes"} // Pass this to customize the text content
+        foundViaYes={foundVia === "yes"}
         totalSteps={TOTAL_STEPS}
       />
     );
   }
 
   const onContinue = () => {
-    if (step === 1 && isStepOneValid) {
-      goToStep(2); // Go to feedback modal
-      return;
-    }
-    // Steps 2 and 3 are handled by their respective modals
+    if (step === 1 && isStepOneValid) goToStep(2);
   };
 
-  // ======= Stepper UI =======
+  // ======= Stepper =======
   const Stepper = () => (
-    <div className="flex items-center gap-3">
+    <div className="flex items-center justify-start gap-3">
       <div className="flex items-center gap-2">
         {Array.from({ length: TOTAL_STEPS }).map((_, i) => {
           const idx = i + 1;
@@ -129,7 +121,10 @@ export default function JobFoundModal({ visible, onClose, onBack }: Props) {
         Congrats on the new role! 🎉
       </h2>
 
-      <div className="mt-6 space-y-6">
+      {/* subtle divider per Figma */}
+      <div className="mt-3 mb-4 h-px bg-gray-200" />
+
+      <div className="space-y-6">
         <div>
           <p
             className="text-[15px] text-gray-700 mb-2"
@@ -158,7 +153,8 @@ export default function JobFoundModal({ visible, onClose, onBack }: Props) {
           >
             How many roles did you <u>apply</u> for through Migrate Mate?*
           </p>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          {/* 4 pills per row on mobile per Figma */}
+          <div className="grid grid-cols-4 gap-3">
             {["0", "1–5", "6–20", "20+"].map((val) => (
               <OptionButton
                 key={val}
@@ -177,7 +173,7 @@ export default function JobFoundModal({ visible, onClose, onBack }: Props) {
           >
             How many companies did you <u>email</u> directly?*
           </p>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <div className="grid grid-cols-4 gap-3">
             {["0", "1–5", "6–20", "20+"].map((val) => (
               <OptionButton
                 key={val}
@@ -196,7 +192,7 @@ export default function JobFoundModal({ visible, onClose, onBack }: Props) {
           >
             How many different companies did you <u>interview</u> with?*
           </p>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <div className="grid grid-cols-4 gap-3">
             {["0", "1–2", "3–5", "5+"].map((val) => (
               <OptionButton
                 key={val}
@@ -209,8 +205,7 @@ export default function JobFoundModal({ visible, onClose, onBack }: Props) {
         </div>
       </div>
 
-      <div className="h-4" />
-      {/* Divider + Continue (desktop) */}
+      {/* Desktop divider + button */}
       <hr className="hidden lg:block mt-6 mb-4 border-gray-200" />
       <button
         onClick={onContinue}
@@ -230,15 +225,14 @@ export default function JobFoundModal({ visible, onClose, onBack }: Props) {
 
   return (
     <>
-      {/* ======== Desktop dialog (MUI) ======== */}
-      <div className="hidden lg:block">
+      {/* ======== Desktop dialog (renders ONLY on desktop) ======== */}
+      {isDesktop && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/30"
           role="dialog"
           aria-modal="true"
           aria-labelledby="job-found-title"
           onClick={(e) => {
-            // click outside closes
             if (e.target === e.currentTarget) onClose();
           }}
         >
@@ -249,30 +243,17 @@ export default function JobFoundModal({ visible, onClose, onBack }: Props) {
             fullWidth
             paperSx={{ borderRadius: 6 }}
           >
-            {/* Desktop header: back (left), centered title+stepper, close (right) */}
+            {/* Desktop header */}
             <div className="w-full px-5 md:px-6 py-4 border-b border-gray-200 flex items-center justify-between">
               <button
                 onClick={() => (onBack ? onBack() : onClose())}
                 className="flex items-center gap-2 text-gray-700 hover:text-gray-900"
                 aria-label="Back"
               >
-                <svg
-                  className="w-5 h-5"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M15 19l-7-7 7-7"
-                  />
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                 </svg>
-                <span
-                  className="text-sm"
-                  style={{ fontFamily: "var(--font-dm-sans)" }}
-                >
+                <span className="text-sm" style={{ fontFamily: "var(--font-dm-sans)" }}>
                   Back
                 </span>
               </button>
@@ -292,18 +273,8 @@ export default function JobFoundModal({ visible, onClose, onBack }: Props) {
                 className="p-1.5 text-gray-400 hover:text-gray-600"
                 aria-label="Close"
               >
-                <svg
-                  className="w-6 h-6"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M6 18L18 6M6 6l12 12"
-                  />
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
             </div>
@@ -326,37 +297,37 @@ export default function JobFoundModal({ visible, onClose, onBack }: Props) {
             </div>
           </ResponsiveDialog>
         </div>
-      </div>
+      )}
 
-      {/* ======== Mobile drawer ======== */}
-      <MUIDrawer
-        open={visible}
-        onClose={onClose}
-        title="Subscription Cancellation"
-        showGrabHandle={false}
-        headerContent={<Stepper />}
-        backButton={{
-          onBack: onBack ? onBack : onClose,
-          label: "Back",
-        }}
-        stickyFooter={
-          <button
-            onClick={onContinue}
-            disabled={!isStepOneValid}
-            className={[
-              "w-full py-3.5 rounded-2xl font-semibold transition-colors",
-              isStepOneValid
-                ? "bg-[#5D3AF7] text-white hover:bg-[#4F2FF3]"
-                : "bg-gray-100 text-gray-400 cursor-not-allowed",
-            ].join(" ")}
-            style={{ fontFamily: "var(--font-dm-sans)" }}
-          >
-            Continue
-          </button>
-        }
-      >
-        {step === 1 && <StepOne />}
-      </MUIDrawer>
+      {/* ======== Mobile drawer (renders on mobile/tablet) ======== */}
+      {!isDesktop && (
+        <MUIDrawer
+          open={visible}
+          onClose={onClose}
+          title="Subscription Cancellation"
+          showGrabHandle={false}
+          headerContent={<Stepper />}
+          backButton={{ onBack: onBack ? onBack : onClose, label: "Back" }}
+          maxHeight="min(75dvh,75vh)"
+          stickyFooter={
+            <button
+              onClick={onContinue}
+              disabled={!isStepOneValid}
+              className={[
+                "w-full h-[56px] rounded-2xl font-semibold transition-colors",
+                isStepOneValid
+                  ? "bg-[#5D3AF7] text-white hover:bg-[#4F2FF3]"
+                  : "bg-gray-100 text-gray-400 cursor-not-allowed",
+              ].join(" ")}
+              style={{ fontFamily: "var(--font-dm-sans)" }}
+            >
+              Continue
+            </button>
+          }
+        >
+          {step === 1 && <StepOne />}
+        </MUIDrawer>
+      )}
     </>
   );
 }
