@@ -23,7 +23,7 @@ export default function SubscriptionOfferModal({
       {/* ===== Desktop dialog (MUI) ===== */}
       <div className="hidden lg:block">
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/30"
+          className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50"
           role="dialog"
           aria-modal="true"
           aria-labelledby="subscription-title"
@@ -138,70 +138,72 @@ export default function SubscriptionOfferModal({
       </div>
 
       {/* ===== Mobile drawer ===== */}
-      <MUIDrawer
-        open={visible}
-        onClose={onClose}
-        title="Subscription"
-        showGrabHandle={true}
-      >
-        {/* Image */}
-        <div className="mt-4 w-full rounded-2xl overflow-hidden shadow-sm border border-gray-200">
-          <div className="relative w-full aspect-[16/9] sm:aspect-[4/3]">
-            <Image
-              src="/empire-state-compressed.jpg"
-              alt="New York City skyline with Empire State Building"
-              fill
-              className="object-cover"
-              sizes="100vw"
-              priority
-            />
+      <div style={{ zIndex: 60 }}>
+        <MUIDrawer
+          open={visible}
+          onClose={onClose}
+          title="Subscription"
+          showGrabHandle={true}
+        >
+          {/* Image */}
+          <div className="mt-4 w-full rounded-2xl overflow-hidden shadow-sm border border-gray-200">
+            <div className="relative w-full aspect-[16/9] sm:aspect-[4/3]">
+              <Image
+                src="/empire-state-compressed.jpg"
+                alt="New York City skyline with Empire State Building"
+                fill
+                className="object-cover"
+                sizes="100vw"
+                priority
+              />
+            </div>
           </div>
-        </div>
 
-        {/* Text */}
-        <h1
-          className="text-[28px] font-semibold text-gray-800 leading-tight mt-5"
-          style={{ fontFamily: "var(--font-dm-sans)" }}
-        >
-          Great choice, mate!
-        </h1>
-
-        <p
-          className="text-[26px] font-semibold text-gray-800 mt-3"
-          style={{ fontFamily: "var(--font-dm-sans)" }}
-        >
-          You&apos;re still on the path to your dream role.{" "}
-          <span className="text-[#8B5CF6]">
-            Let&apos;s make it happen together!
-          </span>
-        </p>
-
-        <div
-          className="text-gray-600 text-[15px] leading-relaxed mt-4 space-y-1"
-          style={{ fontFamily: "var(--font-dm-sans)" }}
-        >
-          <p>You&apos;ve got XX days left on your current plan.</p>
-          <p>Starting from XX date, your monthly payment will be $12.50.</p>
-        </div>
-
-        <p
-          className="text-gray-500 text-[13px] italic mt-3"
-          style={{ fontFamily: "var(--font-dm-sans)" }}
-        >
-          You can cancel anytime before then.
-        </p>
-
-        {/* Button */}
-        <div className="mt-6">
-          <button
-            onClick={onLandDreamRole}
-            className="w-full py-4 rounded-2xl bg-[#8B5CF6] hover:bg-[#7C3AED] transition-all text-white font-semibold focus:outline-none focus:ring-2 focus:ring-[#8B5CF6] focus:ring-offset-2"
+          {/* Text */}
+          <h1
+            className="text-[28px] font-semibold text-gray-800 leading-tight mt-5"
             style={{ fontFamily: "var(--font-dm-sans)" }}
           >
-            Land your dream role
-          </button>
-        </div>
-      </MUIDrawer>
+            Great choice, mate!
+          </h1>
+
+          <p
+            className="text-[26px] font-semibold text-gray-800 mt-3"
+            style={{ fontFamily: "var(--font-dm-sans)" }}
+          >
+            You&apos;re still on the path to your dream role.{" "}
+            <span className="text-[#8B5CF6]">
+              Let&apos;s make it happen together!
+            </span>
+          </p>
+
+          <div
+            className="text-gray-600 text-[15px] leading-relaxed mt-4 space-y-1"
+            style={{ fontFamily: "var(--font-dm-sans)" }}
+          >
+            <p>You&apos;ve got XX days left on your current plan.</p>
+            <p>Starting from XX date, your monthly payment will be $12.50.</p>
+          </div>
+
+          <p
+            className="text-gray-500 text-[13px] italic mt-3"
+            style={{ fontFamily: "var(--font-dm-sans)" }}
+          >
+            You can cancel anytime before then.
+          </p>
+
+          {/* Button */}
+          <div className="mt-6">
+            <button
+              onClick={onLandDreamRole}
+              className="w-full py-4 rounded-2xl bg-[#8B5CF6] hover:bg-[#7C3AED] transition-all text-white font-semibold focus:outline-none focus:ring-2 focus:ring-[#8B5CF6] focus:ring-offset-2"
+              style={{ fontFamily: "var(--font-dm-sans)" }}
+            >
+              Land your dream role
+            </button>
+          </div>
+        </MUIDrawer>
+      </div>
     </>
   );
 }

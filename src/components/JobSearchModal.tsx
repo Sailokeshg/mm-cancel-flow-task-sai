@@ -1,9 +1,10 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import Image from "next/image";
 import ResponsiveDialog from "./ResponsiveDialog";
 import MUIDrawer from "./MUIDrawer";
+import CancellationSurveyModal from "./CancellationSurveyModal";
 
 type Props = {
   visible: boolean;
@@ -24,11 +25,58 @@ export default function JobSearchModal({
   step = 1,
   totalSteps = 3,
 }: Props) {
+  const [showSurveyModal, setShowSurveyModal] = useState(false);
+  const [hideForOfferModal, setHideForOfferModal] = useState(false);
 
+  const handleDecline = () => {
+    setShowSurveyModal(true);
+  };
+
+  const handleSurveySubmit = (feedback: {
+    appliedCount: string;
+    emailedCount: string;
+    interviewedCount: string;
+  }) => {
+    console.log("Survey feedback:", feedback);
+    setShowSurveyModal(false);
+    onDecline(); // Call the original onDecline
+  };
+
+  const handleAcceptOffer = () => {
+    setShowSurveyModal(false);
+    onAccept(); // Call the original onAccept
+  };
+
+  const handleSurveyBack = () => {
+    setShowSurveyModal(false);
+  };
+
+  const handleOfferModalShow = () => {
+    setHideForOfferModal(true);
+  };
+
+  const handleOfferModalClose = () => {
+    setHideForOfferModal(false);
+  };
 
   if (!visible) return null;
 
-
+  // If offer modal is being shown, only render the survey modal (which contains the offer modal)
+  if (hideForOfferModal) {
+    return (
+      <CancellationSurveyModal
+        visible={showSurveyModal}
+        onClose={() => setShowSurveyModal(false)}
+        onBack={handleSurveyBack}
+        onSubmit={handleSurveySubmit}
+        onAcceptOffer={handleAcceptOffer}
+        onOfferModalShow={handleOfferModalShow}
+        onOfferModalClose={handleOfferModalClose}
+        step={2}
+        totalSteps={3}
+      />
+    );
+  }
 
   // ===== Stepper =====
   const Stepper = () => (
@@ -120,7 +168,7 @@ export default function JobSearchModal({
 
       {/* Desktop ghost button */}
       <button
-        onClick={onDecline}
+        onClick={handleDecline}
         className="hidden md:block mt-6 w-full py-3.5 rounded-2xl border border-gray-300 bg-white text-gray-800 font-semibold hover:bg-gray-50 transition-colors"
         style={{ fontFamily: "var(--font-dm-sans)" }}
       >
@@ -244,7 +292,7 @@ export default function JobSearchModal({
         }}
         stickyFooter={
           <button
-            onClick={onDecline}
+            onClick={handleDecline}
             className="w-full py-3.5 rounded-2xl border border-gray-300 bg-white text-gray-800 font-semibold hover:bg-gray-50 transition-colors"
             style={{ fontFamily: "var(--font-dm-sans)" }}
           >
@@ -256,8 +304,7 @@ export default function JobSearchModal({
           className="text-[28px] font-semibold text-gray-800 leading-tight"
           style={{ fontFamily: "var(--font-dm-sans)" }}
         >
-          We built this to help you land the job, this makes it a little
-          easier.
+          We built this to help you land the job, this makes it a little easier.
         </h1>
 
         <p
@@ -271,6 +318,19 @@ export default function JobSearchModal({
           <OfferCard />
         </div>
       </MUIDrawer>
+
+      {/* Survey Modal */}
+      <CancellationSurveyModal
+        visible={showSurveyModal}
+        onClose={() => setShowSurveyModal(false)}
+        onBack={handleSurveyBack}
+        onSubmit={handleSurveySubmit}
+        onAcceptOffer={handleAcceptOffer}
+        onOfferModalShow={handleOfferModalShow}
+        onOfferModalClose={handleOfferModalClose}
+        step={2}
+        totalSteps={3}
+      />
     </>
   );
 }
