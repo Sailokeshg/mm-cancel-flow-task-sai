@@ -6,6 +6,9 @@ import useMediaQuery from "@mui/material/useMediaQuery";
 import { DESKTOP_MIN_WIDTH_PX, FONT_DM_SANS_VAR } from "../lib/ui/constants";
 import ResponsiveDialog from "./ResponsiveDialog";
 import MUIDrawer from "./MUIDrawer";
+import ModalStepper from "./ModalStepper";
+import ModalHeader from "./ModalHeader";
+import PrimaryButton from "./PrimaryButton";
 
 type Props = {
   visible: boolean;
@@ -75,38 +78,7 @@ function CancellationReasonModal({
 
   const handleAcceptOffer = () => onAcceptOffer?.();
 
-  // Stepper
-  const Stepper = () => (
-    <div className="flex items-center justify-start gap-3">
-      <div className="flex items-center gap-2">
-        {Array.from({ length: totalSteps }).map((_, i) => {
-          const idx = i + 1;
-          const isCompleted = idx < step;
-          const isCurrent = idx === step;
-          return (
-            <span
-              key={idx}
-              className={[
-                "h-2 rounded-full transition-colors",
-                isCurrent ? "w-6" : "w-5",
-                isCompleted
-                  ? "bg-green-500"
-                  : isCurrent
-                  ? "bg-gray-500"
-                  : "bg-gray-300",
-              ].join(" ")}
-            />
-          );
-        })}
-      </div>
-      <span
-        className="text-sm text-gray-600"
-        style={{ fontFamily: FONT_DM_SANS_VAR }}
-      >
-        Step {step} of {totalSteps}
-      </span>
-    </div>
-  );
+  // Use shared ModalStepper for step UI
 
   // Radio option
   const RadioOption = ({ value, label }: { value: string; label: string }) => (
@@ -365,7 +337,7 @@ function CancellationReasonModal({
         Please take a minute to let us know why:
       </p>
 
-  {/* initial validation message shown on desktop when none picked */}
+      {/* initial validation message shown on desktop when none picked */}
       {!selectedReason && (
         <p
           className="mt-6 text-[15px] text-red-500"
@@ -424,10 +396,10 @@ function CancellationReasonModal({
         Please take a minute to let us know why:
       </p>
 
-  {/* thin divider */}
+      {/* thin divider */}
       <div className="mt-3 mb-3 h-px bg-gray-200" />
 
-  {/* red validation note until a reason is chosen */}
+      {/* red validation note until a reason is chosen */}
       {!selectedReason && (
         <p
           className="text-[15px] text-red-500"
@@ -444,7 +416,7 @@ function CancellationReasonModal({
 
   return (
     <>
-  {/* Desktop (>=1024px) */}
+      {/* Desktop (>=1024px) */}
       {isDesktop && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/30"
@@ -463,64 +435,21 @@ function CancellationReasonModal({
             paperSx={{ borderRadius: 6 }}
             desktopOnly
             title={
-              <div className="flex items-center justify-between w-full">
-                <button
-                  onClick={() => (onBack ? onBack() : onClose())}
-                  className="flex items-center gap-2 text-gray-700 hover:text-gray-900"
-                  aria-label="Back"
-                >
-                  <svg
-                    className="w-5 h-5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M15 19l-7-7 7-7"
-                    />
-                  </svg>
-                  <span
-                    className="text-sm"
-                    style={{ fontFamily: FONT_DM_SANS_VAR }}
-                  >
-                    Back
-                  </span>
-                </button>
-
-                <div className="flex items-center gap-4">
-                  <h3
-                    id="reason-title"
-                    className="text-base md:text-lg font-semibold text-gray-900"
-                    style={{ fontFamily: FONT_DM_SANS_VAR }}
-                  >
-                    Subscription Cancellation
-                  </h3>
-                  <Stepper />
-                </div>
-
-                <button
-                  onClick={onClose}
-                  className="p-1.5 text-gray-400 hover:text-gray-600"
-                  aria-label="Close"
-                >
-                  <svg
-                    className="w-6 h-6"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M6 18L18 6M6 6l12 12"
-                    />
-                  </svg>
-                </button>
-              </div>
+              <ModalHeader
+                title={
+                  <div className="flex items-center gap-4">
+                    <span
+                      className="text-base md:text-lg font-semibold text-gray-900"
+                      style={{ fontFamily: FONT_DM_SANS_VAR }}
+                    >
+                      Subscription Cancellation
+                    </span>
+                    <ModalStepper totalSteps={totalSteps} stepIndex={step} />
+                  </div>
+                }
+                onClose={onClose}
+                onBack={onBack ? onBack : undefined}
+              />
             }
           >
             <div className="grid grid-cols-1 lg:grid-cols-[1.1fr_0.9fr] gap-8 p-6 md:p-10">
@@ -545,35 +474,34 @@ function CancellationReasonModal({
         </div>
       )}
 
-  {/* Mobile (<1024px) */}
+      {/* Mobile (<1024px) */}
       {!isDesktop && (
         <MUIDrawer
           open={visible}
           onClose={onClose}
           title="Subscription Cancellation"
           showGrabHandle={false}
-          headerContent={<Stepper />}
+          headerContent={
+            <ModalStepper totalSteps={totalSteps} stepIndex={step} />
+          }
           backButton={{ onBack: onBack ? onBack : onClose, label: "Back" }}
           maxHeight="min(75dvh,75vh)"
           stickyFooter={
-            <div className="space-y-3">
-              <button
-                onClick={handleAcceptOffer}
-                className="w-full h-[56px] rounded-2xl font-semibold text-white bg-[#28B463] hover:bg-[#24A259] transition-colors flex items-center justify-center gap-2"
-                style={{ fontFamily: FONT_DM_SANS_VAR }}
-              >
+            <div className="mt-8">
+              <PrimaryButton onClick={handleAcceptOffer} variant="success">
                 <span>Get 50% off</span>
                 <span className="text-lg">|</span>
                 <span className="text-lg font-bold">$12.50</span>
                 <span className="text-sm line-through text-green-200 ml-1">
                   $25
                 </span>
-              </button>
+              </PrimaryButton>
+
               <button
                 onClick={handleContinue}
                 disabled={!isFormValid}
                 className={[
-                  "w-full h-[56px] rounded-2xl font-semibold transition-colors",
+                  "hidden lg:block w-full mt-4 py-3.5 rounded-2xl font-semibold transition-colors",
                   isFormValid
                     ? "bg-gray-100 text-gray-500 hover:bg-gray-200 border border-gray-200"
                     : "bg-gray-100 text-gray-400 border border-gray-200 cursor-not-allowed",

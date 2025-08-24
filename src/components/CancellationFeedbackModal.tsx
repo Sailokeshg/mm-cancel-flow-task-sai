@@ -5,6 +5,9 @@ import Image from "next/image";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import ResponsiveDialog from "./ResponsiveDialog";
 import MUIDrawer from "./MUIDrawer";
+import ModalStepper from "./ModalStepper";
+import ModalHeader from "./ModalHeader";
+import PrimaryButton from "./PrimaryButton";
 import { DESKTOP_MIN_WIDTH_PX, FONT_DM_SANS_VAR } from "../lib/ui/constants";
 
 type Props = {
@@ -16,39 +19,7 @@ type Props = {
 };
 
 /* ---------- Extracted: Stepper (stable identity) ---------- */
-function Stepper({
-  totalSteps,
-  stepIndex,
-  fontFamilyVar,
-}: {
-  totalSteps: number;
-  stepIndex: number;
-  fontFamilyVar: string;
-}) {
-  return (
-    <div className="flex items-center justify-start gap-3">
-      <div className="flex items-center gap-2">
-        {Array.from({ length: totalSteps }).map((_, i) => {
-          const idx = i + 1;
-          const isDoneOrCurrent = idx <= stepIndex;
-          return (
-            <span
-              key={idx}
-              className={[
-                "h-2 rounded-full transition-[width,background-color]",
-                idx === stepIndex ? "w-8" : "w-5",
-                isDoneOrCurrent ? "bg-green-500" : "bg-gray-300",
-              ].join(" ")}
-            />
-          );
-        })}
-      </div>
-      <span className="text-sm text-gray-600" style={{ fontFamily: fontFamilyVar }}>
-        Step {stepIndex} of {totalSteps}
-      </span>
-    </div>
-  );
-}
+// Replaced by shared ModalStepper
 
 /* ---------- Extracted: LeftContent (stable identity) ---------- */
 function LeftContent({
@@ -104,19 +75,13 @@ function LeftContent({
 
       {/* Desktop divider + Continue */}
       <hr className="hidden md:block mt-6 mb-4 border-gray-200" />
-      <button
+      <PrimaryButton
         onClick={handleContinue}
         disabled={!isValid}
-        className={[
-          "hidden md:block w-full py-3.5 rounded-2xl font-semibold transition-colors",
-          isValid
-            ? "bg-[#5D3AF7] text-white hover:bg-[#4F2FF3]"
-            : "bg-gray-100 text-gray-400 cursor-not-allowed",
-        ].join(" ")}
-        style={{ fontFamily: "var(--font-dm-sans)" }}
+        className="hidden md:block"
       >
         Continue
-      </button>
+      </PrimaryButton>
     </div>
   );
 }
@@ -173,64 +138,25 @@ function CancellationFeedbackModal({
             paperSx={{ borderRadius: 6 }}
           >
             <div className="relative">
-              <div className="w-full px-5 md:px-6 py-4 border-b border-gray-200">
-                <button
-                  onClick={() => (onBack ? onBack() : onClose())}
-                  className="absolute left-4 top-4 flex items-center gap-2 text-gray-700 hover:text-gray-900"
-                  aria-label="Back"
-                >
-                  <svg
-                    className="w-5 h-5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M15 19l-7-7 7-7"
-                    />
-                  </svg>
-                  <span className="text-sm" style={{ fontFamily: FONT_DM_SANS_VAR }}>
-                    Back
-                  </span>
-                </button>
-
-                <div className="flex items-center justify-center gap-4">
-                  <h3
-                    id="feedback-title"
-                    className="text-base md:text-lg font-semibold text-gray-900"
-                    style={{ fontFamily: FONT_DM_SANS_VAR }}
-                  >
-                    Subscription Cancellation
-                  </h3>
-                  <Stepper
-                    totalSteps={totalSteps}
-                    stepIndex={STEP_INDEX}
-                    fontFamilyVar={FONT_DM_SANS_VAR}
-                  />
-                </div>
-
-                <button
-                  onClick={onClose}
-                  className="absolute right-4 top-4 text-gray-400 hover:text-gray-600"
-                  aria-label="Close"
-                >
-                  <svg
-                    className="w-6 h-6"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M6 18L18 6M6 6l12 12"
-                    />
-                  </svg>
-                </button>
+              <div className="w-full px-5 md:px-6 py-4 border-b border-gray-200 relative">
+                <ModalHeader
+                  title={
+                    <div className="flex items-center justify-center gap-4">
+                      <span
+                        className="text-base md:text-lg font-semibold text-gray-900"
+                        style={{ fontFamily: FONT_DM_SANS_VAR }}
+                      >
+                        Subscription Cancellation
+                      </span>
+                      <ModalStepper
+                        totalSteps={totalSteps}
+                        stepIndex={STEP_INDEX}
+                      />
+                    </div>
+                  }
+                  onClose={onClose}
+                  onBack={onBack}
+                />
               </div>
 
               <div className="grid grid-cols-1 lg:grid-cols-[1.1fr_0.9fr] gap-8 p-6 md:p-10">
@@ -242,7 +168,6 @@ function CancellationFeedbackModal({
                     MIN={MIN}
                     isValid={isValid}
                     handleContinue={handleContinue}
-
                   />
                 </div>
 
@@ -272,11 +197,7 @@ function CancellationFeedbackModal({
           title="Subscription Cancellation"
           showGrabHandle={false}
           headerContent={
-            <Stepper
-              totalSteps={totalSteps}
-              stepIndex={STEP_INDEX}
-              fontFamilyVar={FONT_DM_SANS_VAR}
-            />
+            <ModalStepper totalSteps={totalSteps} stepIndex={STEP_INDEX} />
           }
           backButton={{
             onBack: onBack ? onBack : onClose,
