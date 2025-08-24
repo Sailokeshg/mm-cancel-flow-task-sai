@@ -1,10 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import CancellationModal from "../components/CancellationModal";
-import JobFoundModal from "../components/JobFoundModal";
-import JobSearchModal from "../components/JobSearchModal";
-import SubscriptionOfferModal from "../components/SubscriptionOfferModal";
+import CancellationModal from "../components/modals/CancellationModal";
+import JobFoundModal from "../components/modals/JobFoundModal";
+import JobSearchModal from "../components/modals/JobSearchModal";
+import SubscriptionOfferModal from "../components/modals/SubscriptionOfferModal";
 // Mock user data for UI display
 const mockUser = {
   email: "user@example.com",

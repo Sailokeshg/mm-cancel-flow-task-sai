@@ -9,10 +9,7 @@ import useMediaQuery from "@mui/material/useMediaQuery";
 import type { SxProps } from "@mui/system";
 import type { Theme } from "@mui/material/styles";
 
-/**
- * Props for ResponsiveDialog
- * - behavior is unchanged from previous implementation
- */
+
 type Props = {
   open: boolean;
   onClose: () => void;
@@ -22,12 +19,10 @@ type Props = {
   maxWidth?: DialogProps["maxWidth"];
   fullWidth?: boolean;
   paperSx?: SxProps<Theme> | undefined;
-  /** If true, don't render at all below DESKTOP_MIN_WIDTH (prevents portal on mobile). */
   desktopOnly?: boolean;
 };
 
-// Keep UI-related constants near the top so they're easy to adjust and test.
-const DESKTOP_MIN_WIDTH_PX = 1024; // Tailwind 'lg' alignment
+const DESKTOP_MIN_WIDTH_PX = 1024;
 const ARIA_TITLE_ID = "responsive-dialog-title";
 const BACKDROP_RGBA = "rgba(255,255,255,0.55)";
 const BACKDROP_BLUR = "blur(50px) brightness(0.9)";
@@ -43,12 +38,10 @@ function ResponsiveDialog({
   paperSx,
   desktopOnly = false,
 }: Props) {
-  // Tailwind-aligned breakpoint check. Kept as px string to avoid coupling
-  // to a theme implementation but still be easy to change.
+
   const isDesktop = useMediaQuery(`(min-width:${DESKTOP_MIN_WIDTH_PX}px)`);
   const isBelowDesktop = !isDesktop;
 
-  // If asked to be desktop-only, don't mount on smaller viewports (prevents portal mounting)
   if (desktopOnly && isBelowDesktop) return null;
 
   return (

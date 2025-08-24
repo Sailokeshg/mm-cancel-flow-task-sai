@@ -3,10 +3,10 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import useMediaQuery from "@mui/material/useMediaQuery";
-import { DESKTOP_MIN_WIDTH_PX, FONT_DM_SANS_VAR } from "../lib/ui/constants";
-import OptionButton from "./OptionButton";
+import { DESKTOP_MIN_WIDTH_PX, FONT_DM_SANS_VAR } from "../../lib/ui/constants";
+import OptionButton from "../buttons/OptionButton";
 import ResponsiveDialog from "./ResponsiveDialog";
-import MUIDrawer from "./MUIDrawer";
+import MUIDrawer from "../ui/MUIDrawer";
 import SubscriptionOfferModal from "./SubscriptionOfferModal";
 import CancellationReasonModal from "./CancellationReasonModal";
 import CancellationFinalModal from "./CancellationFinalModal";

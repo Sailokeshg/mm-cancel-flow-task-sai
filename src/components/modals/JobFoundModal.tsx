@@ -3,14 +3,14 @@
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import useMediaQuery from "@mui/material/useMediaQuery";
-import { DESKTOP_MIN_WIDTH_PX, FONT_DM_SANS_VAR } from "../lib/ui/constants";
-import OptionButton from "./OptionButton";
+import { DESKTOP_MIN_WIDTH_PX, FONT_DM_SANS_VAR } from "../../lib/ui/constants";
+import OptionButton from "../buttons/OptionButton";
 import CancellationFeedbackModal from "./CancellationFeedbackModal";
 import CancellationVisaSupportModal from "./CancellationVisaSupportModel";
 import CancellationProcessedModal from "./CancellationProcessedModal";
 import CancellationCompletionModal from "./CancellationCompletionModal";
 import ResponsiveDialog from "./ResponsiveDialog";
-import MUIDrawer from "./MUIDrawer";
+import MUIDrawer from "../ui/MUIDrawer";
 
 type Props = {
   visible: boolean;
@@ -22,19 +22,16 @@ function JobFoundModal({ visible, onClose, onBack }: Props) {
   // Desktop breakpoint aligned with Tailwind `lg`
   const isDesktop = useMediaQuery(`(min-width:${DESKTOP_MIN_WIDTH_PX}px)`);
 
-  // ======= Steps (3 total as per Figma) =======
   const TOTAL_STEPS = 3;
   const [step, setStep] = useState(1);
   const [foundVia, setFoundVia] = useState<string | null>(null);
 
-  // ======= Completion flow state =======
   const [showProcessedModal, setShowProcessedModal] = useState(false);
   const [showCompletionModal, setShowCompletionModal] = useState(false);
 
   const goToStep = (n: number) =>
     setStep(Math.min(Math.max(n, 1), TOTAL_STEPS));
 
-  // ======= Form state (Step 1) =======
   const [appliedCount, setAppliedCount] = useState<string | null>(null);
   const [emailedCount, setEmailedCount] = useState<string | null>(null);
   const [interviewedCount, setInterviewedCount] = useState<string | null>(null);
@@ -58,7 +55,6 @@ function JobFoundModal({ visible, onClose, onBack }: Props) {
 
   if (!visible) return null;
 
-  // Step 2 & 3 are separate modals (to avoid stacking UI underneath)
   if (step === 2) {
     return (
       <CancellationFeedbackModal
@@ -121,7 +117,6 @@ function JobFoundModal({ visible, onClose, onBack }: Props) {
         onBack={() => goToStep(2)}
         onClose={onClose}
         onComplete={async (companyProvidesLawyer: boolean) => {
-          // Persist cancellation to backend for dev (uses mock user + seeded subscription)
           try {
             await fetch("/api/cancellations", {
               method: "POST",

@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { FONT_DM_SANS_VAR } from "../lib/ui/constants";
+import { FONT_DM_SANS_VAR } from "../../lib/ui/constants";
 
 type OptionButtonProps = {
   label: string;

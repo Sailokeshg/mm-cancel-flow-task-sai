@@ -4,10 +4,10 @@ import React from "react";
 import Image from "next/image";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import ResponsiveDialog from "./ResponsiveDialog";
-import MUIDrawer from "./MUIDrawer";
-import ModalStepper from "./ModalStepper";
-import ModalHeader from "./ModalHeader";
-import { DESKTOP_MIN_WIDTH_PX, FONT_DM_SANS_VAR } from "../lib/ui/constants";
+import MUIDrawer from "../ui/MUIDrawer";
+import ModalStepper from "../ui/ModalStepper";
+import ModalHeader from "../ui/ModalHeader";
+import { DESKTOP_MIN_WIDTH_PX, FONT_DM_SANS_VAR } from "../../lib/ui/constants";
 
 type Props = {
   visible: boolean;

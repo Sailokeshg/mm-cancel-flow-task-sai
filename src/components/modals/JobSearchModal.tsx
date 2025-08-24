@@ -3,9 +3,9 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import useMediaQuery from "@mui/material/useMediaQuery";
-import { DESKTOP_MIN_WIDTH_PX, FONT_DM_SANS_VAR } from "../lib/ui/constants";
+import { DESKTOP_MIN_WIDTH_PX, FONT_DM_SANS_VAR } from "../../lib/ui/constants";
 import ResponsiveDialog from "./ResponsiveDialog";
-import MUIDrawer from "./MUIDrawer";
+import MUIDrawer from "../ui/MUIDrawer";
 import CancellationSurveyModal from "./CancellationSurveyModal";
 
 type Props = {
@@ -141,7 +141,10 @@ function JobSearchModal({
         Get 50% off
       </button>
 
-      <p className=" text-[15px] italic text-gray-600 text-center" style={{ fontFamily: FONT_DM_SANS_VAR }}>
+      <p
+        className=" text-[15px] italic text-gray-600 text-center"
+        style={{ fontFamily: FONT_DM_SANS_VAR }}
+      >
         You won’t be charged until your next billing date.
       </p>
     </div>
@@ -179,7 +182,7 @@ function JobSearchModal({
 
   return (
     <>
-  {/* Desktop (>=1024px): Dialog */}
+      {/* Desktop (>=1024px): Dialog */}
       {isDesktop && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/30"
@@ -217,7 +220,10 @@ function JobSearchModal({
                       d="M15 19l-7-7 7-7"
                     />
                   </svg>
-                  <span className="text-sm" style={{ fontFamily: FONT_DM_SANS_VAR }}>
+                  <span
+                    className="text-sm"
+                    style={{ fontFamily: FONT_DM_SANS_VAR }}
+                  >
                     Back
                   </span>
                 </button>
@@ -278,7 +284,7 @@ function JobSearchModal({
         </div>
       )}
 
-  {/* Mobile (<1024px): Bottom sheet */}
+      {/* Mobile (<1024px): Bottom sheet */}
       {!isDesktop && (
         <MUIDrawer
           open={visible}

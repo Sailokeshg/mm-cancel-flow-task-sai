@@ -8,11 +8,11 @@ import {
   FONT_DM_SANS_VAR,
   BACKDROP_RGBA,
   BACKDROP_BLUR,
-} from "../lib/ui/constants";
+} from "../../lib/ui/constants";
 import ResponsiveDialog from "./ResponsiveDialog";
-import MUIDrawer from "./MUIDrawer";
-import ModalHeader from "./ModalHeader";
-import PrimaryButton from "./PrimaryButton";
+import MUIDrawer from "../ui/MUIDrawer";
+import ModalHeader from "../ui/ModalHeader";
+import PrimaryButton from "../buttons/PrimaryButton";
 
 type Props = {
   visible: boolean;
