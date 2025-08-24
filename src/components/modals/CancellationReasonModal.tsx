@@ -501,7 +501,7 @@ function CancellationReasonModal({
                 onClick={handleContinue}
                 disabled={!isFormValid}
                 className={[
-                  "hidden lg:block w-full mt-4 py-3.5 rounded-2xl font-semibold transition-colors",
+                  "w-full mt-4 py-3.5 rounded-2xl font-semibold transition-colors",
                   isFormValid
                     ? "bg-gray-100 text-gray-500 hover:bg-gray-200 border border-gray-200"
                     : "bg-gray-100 text-gray-400 border border-gray-200 cursor-not-allowed",
