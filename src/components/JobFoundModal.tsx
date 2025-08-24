@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import useMediaQuery from "@mui/material/useMediaQuery";
+import { DESKTOP_MIN_WIDTH_PX, FONT_DM_SANS_VAR } from "../lib/ui/constants";
 import OptionButton from "./OptionButton";
 import CancellationFeedbackModal from "./CancellationFeedbackModal";
 import CancellationVisaSupportModal from "./CancellationVisaSupportModel";
@@ -17,9 +18,9 @@ type Props = {
   onBack?: () => void;
 };
 
-export default function JobFoundModal({ visible, onClose, onBack }: Props) {
+function JobFoundModal({ visible, onClose, onBack }: Props) {
   // Desktop breakpoint aligned with Tailwind `lg`
-  const isDesktop = useMediaQuery("(min-width:1024px)");
+  const isDesktop = useMediaQuery(`(min-width:${DESKTOP_MIN_WIDTH_PX}px)`);
 
   // ======= Steps (3 total as per Figma) =======
   const TOTAL_STEPS = 3;
@@ -119,9 +120,24 @@ export default function JobFoundModal({ visible, onClose, onBack }: Props) {
         visible
         onBack={() => goToStep(2)}
         onClose={onClose}
-        onComplete={(companyProvidesLawyer: boolean) => {
-          // If company provides lawyer (Yes), show processed modal
-          // If company doesn't provide lawyer (No), show completion modal
+        onComplete={async (companyProvidesLawyer: boolean) => {
+          // Persist cancellation to backend for dev (uses mock user + seeded subscription)
+          try {
+            await fetch("/api/cancellations", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                // TODO: replace with real subscription id when available
+                subscription_id: "550e8400-e29b-41d4-a716-446655440001",
+                reason: null,
+                accepted: true,
+                accepted_downsell: false,
+              }),
+            });
+          } catch (e) {
+            console.error("Failed to persist cancellation", e);
+          }
+
           if (companyProvidesLawyer) {
             setShowProcessedModal(true);
           } else {
@@ -159,7 +175,7 @@ export default function JobFoundModal({ visible, onClose, onBack }: Props) {
       </div>
       <span
         className="text-sm text-gray-600"
-        style={{ fontFamily: "var(--font-dm-sans)" }}
+        style={{ fontFamily: FONT_DM_SANS_VAR }}
       >
         Step {step} of {TOTAL_STEPS}
       </span>
@@ -171,7 +187,7 @@ export default function JobFoundModal({ visible, onClose, onBack }: Props) {
     <>
       <h2
         className="text-[28px] md:text-[34px] font-semibold text-gray-800 leading-snug"
-        style={{ fontFamily: "var(--font-dm-sans)" }}
+        style={{ fontFamily: FONT_DM_SANS_VAR }}
       >
         Congrats on the new role! 🎉
       </h2>
@@ -183,7 +199,7 @@ export default function JobFoundModal({ visible, onClose, onBack }: Props) {
         <div>
           <p
             className="text-[15px] text-gray-700 mb-2"
-            style={{ fontFamily: "var(--font-dm-sans)" }}
+            style={{ fontFamily: FONT_DM_SANS_VAR }}
           >
             Did you find this job with MigrateMate?*
           </p>
@@ -204,7 +220,7 @@ export default function JobFoundModal({ visible, onClose, onBack }: Props) {
         <div>
           <p
             className="text-[15px] text-gray-700 mb-2"
-            style={{ fontFamily: "var(--font-dm-sans)" }}
+            style={{ fontFamily: FONT_DM_SANS_VAR }}
           >
             How many roles did you <u>apply</u> for through Migrate Mate?*
           </p>
@@ -224,7 +240,7 @@ export default function JobFoundModal({ visible, onClose, onBack }: Props) {
         <div>
           <p
             className="text-[15px] text-gray-700 mb-2"
-            style={{ fontFamily: "var(--font-dm-sans)" }}
+            style={{ fontFamily: FONT_DM_SANS_VAR }}
           >
             How many companies did you <u>email</u> directly?*
           </p>
@@ -243,7 +259,7 @@ export default function JobFoundModal({ visible, onClose, onBack }: Props) {
         <div>
           <p
             className="text-[15px] text-gray-700 mb-2"
-            style={{ fontFamily: "var(--font-dm-sans)" }}
+            style={{ fontFamily: FONT_DM_SANS_VAR }}
           >
             How many different companies did you <u>interview</u> with?*
           </p>
@@ -271,7 +287,7 @@ export default function JobFoundModal({ visible, onClose, onBack }: Props) {
             ? "bg-[#5D3AF7] text-white hover:bg-[#4F2FF3]"
             : "bg-gray-100 text-gray-400 cursor-not-allowed",
         ].join(" ")}
-        style={{ fontFamily: "var(--font-dm-sans)" }}
+        style={{ fontFamily: FONT_DM_SANS_VAR }}
       >
         Continue
       </button>
@@ -320,7 +336,7 @@ export default function JobFoundModal({ visible, onClose, onBack }: Props) {
                 </svg>
                 <span
                   className="text-sm"
-                  style={{ fontFamily: "var(--font-dm-sans)" }}
+                  style={{ fontFamily: FONT_DM_SANS_VAR }}
                 >
                   Back
                 </span>
@@ -329,7 +345,7 @@ export default function JobFoundModal({ visible, onClose, onBack }: Props) {
               <div className="flex items-center gap-4">
                 <h3
                   className="text-base md:text-lg font-semibold text-gray-900"
-                  style={{ fontFamily: "var(--font-dm-sans)" }}
+                  style={{ fontFamily: FONT_DM_SANS_VAR }}
                 >
                   Subscription Cancellation
                 </h3>
@@ -397,7 +413,7 @@ export default function JobFoundModal({ visible, onClose, onBack }: Props) {
                   ? "bg-[#5D3AF7] text-white hover:bg-[#4F2FF3]"
                   : "bg-gray-100 text-gray-400 cursor-not-allowed",
               ].join(" ")}
-              style={{ fontFamily: "var(--font-dm-sans)" }}
+              style={{ fontFamily: FONT_DM_SANS_VAR }}
             >
               Continue
             </button>
@@ -409,3 +425,5 @@ export default function JobFoundModal({ visible, onClose, onBack }: Props) {
     </>
   );
 }
+
+export default React.memo(JobFoundModal);

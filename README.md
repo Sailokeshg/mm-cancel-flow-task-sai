@@ -11,6 +11,7 @@ Implement the Figma-designed cancellation journey exactly on mobile + desktop, p
 ## What's Provided
 
 This repository contains:
+
 - ✅ Next.js + TypeScript + Tailwind scaffold
 - ✅ `seed.sql` with users table (25/29 USD plans) and empty cancellations table
 - ✅ Local Supabase configuration for development
@@ -24,106 +25,54 @@ This repository contains:
 - **Supabase** (Postgres + Row-Level Security)
 
 > **Alternative stacks allowed** if your solution:
+>
 > 1. Runs with `npm install && npm run dev`
-> 2. Persists to a Postgres-compatible database
-> 3. Enforces table-level security
 
-## Must-Have Features
+# Migrate Mate — Cancellation flow (one-page)
 
-### 1. Progressive Flow (Figma Design)
-- Implement the exact cancellation journey from provided Figma
-- Ensure pixel-perfect fidelity on both mobile and desktop
-- Handle all user interactions and state transitions
+This README explains the implemented architecture decisions, security measures, and the deterministic A/B downsell approach required by the challenge.
 
-### 2. Deterministic A/B Testing (50/50 Split)
-- **On first entry**: Assign variant via cryptographically secure RNG
-- **Persist** variant to `cancellations.downsell_variant` field
-- **Reuse** variant on repeat visits (never re-randomize)
+Architecture decisions
 
-**Variant A**: No downsell screen
-**Variant B**: Show "$10 off" offer
-- Price $25 → $15, Price $29 → $19
-- **Accept** → Log action, take user back to profile page (NO ACTUAL PAYMENT PROCESSING REQUIRED)
-- **Decline** → Continue to reason selection in flow
+- Next.js (App Router) + TypeScript: keeps server routes and client UI together; API routes live in `src/app/api/*` and are used for all stateful operations.
+- Server-side DB writes via Supabase admin client (`src/lib/supabase.ts`): prevents exposing privileged keys to the browser and allows enforcing RLS on the DB side.
+- UI: client components live under `src/components/*`. They handle UX only and call the server endpoints for persistence and variant decisions.
+- Mock auth for dev: `src/lib/mockUser.ts` maps to seeded users in `seed.sql` so the flow works locally without third-party auth.
 
-### 3. Data Persistence
-- Mark subscription as `pending_cancellation` in database
-- Create cancellation record with:
-  - `user_id`
-  - `downsell_variant` (A or B)
-  - `reason` (from user selection)
-  - `accepted_downsell` (boolean)
-  - `created_at` (timestamp)
+Security implementation
 
-### 4. Security Requirements
-- **Row-Level Security (RLS)** policies
-- **Input validation** on all user inputs
-- **CSRF/XSS protection**
-- Secure handling of sensitive data
+- Row-Level Security: RLS is enabled in `seed.sql` and basic policies exist; server-side admin writes are used in dev to bypass client RLS while keeping production policies enforceable.
+- Server-side validation & sanitization: API validates subscription IDs, parses JSON safely, and sanitizes free-text `reason` (trim, 500-char limit, strip control characters) to reduce XSS/DB injection risk.
+- CSRF/XSS: state changes are made via server endpoints (not direct client DB writes). For production, add CSRF tokens and stricter headers if exposing any form endpoints.
+- Sensitive data: payment processing is out-of-scope and only stubbed; avoid logging any payment or card-like data.
 
-### 5. Reproducible Setup
-- `npm run db:setup` creates schema and seed data (local development)
-- Clear documentation for environment setup
+A/B testing approach (deterministic & persistent)
 
-## Out of Scope
+- Assignment: on first entry the server uses a cryptographically secure RNG (Node's crypto.randomInt(0,2)) to pick 'A' or 'B'.
+- Persistence: the chosen variant is saved to `cancellations.downsell_variant` and returned on subsequent visits — the server never re-randomizes for that user.
+- Variant behavior: Variant B shows a $10-off downsell. Prices are stored in cents (e.g., 2500 → $25.00). Downsells compute as `downsell_price = monthly_price - 1000`.
 
-- **Payment processing** - Stub with comments only
-- **User authentication** - Use mock user data
-- **Email notifications** - Not required
-- **Analytics tracking** - Focus on core functionality
+Reproducible setup
 
-## Getting Started
+1. Install dependencies and seed the DB locally:
 
-1. **Clone this repository** `git clone [repo]`
-2. **Install dependencies**: `npm install`
-3. **Set up local database**: `npm run db:setup`
-4. **Start development**: `npm run dev`
+```bash
+npm install
+npm run db:setup
+```
 
-## Database Schema
+2. Start dev server:
 
-The `seed.sql` file provides a **starting point** with:
-- `users` table with sample users
-- `subscriptions` table with $25 and $29 plans
-- `cancellations` table (minimal structure - **you'll need to expand this**)
-- Basic RLS policies (enhance as needed)
+```bash
+npm run dev
+```
 
-### Important: Schema Design Required
+Files to review
 
-The current `cancellations` table is intentionally minimal. You'll need to:
-- **Analyze the cancellation flow requirements** from the Figma design
-- **Design appropriate table structure(s)** to capture all necessary data
-- **Consider data validation, constraints, and relationships**
-- **Ensure the schema supports the A/B testing requirements**
+- API: `src/app/api/cancellations/route.ts` (GET returns/creates variant; POST persists reason/accepted flags and updates subscription status).
+- Mock user: `src/lib/mockUser.ts` (dev only).
+- DB seed and RLS: `seed.sql`.
 
-## Evaluation Criteria
+Notes & next steps
 
-- **Functionality (40%)**: Feature completeness and correctness
-- **Code Quality (25%)**: Clean, maintainable, well-structured code
-- **Pixel/UX Fidelity (15%)**: Accuracy to Figma design
-- **Security (10%)**: Proper RLS, validation, and protection
-- **Documentation (10%)**: Clear README and code comments
-
-## Deliverables
-
-1. **Working implementation** in this repository
-2. **NEW One-page README.md (replace this)** (≤600 words) explaining:
-   - Architecture decisions
-   - Security implementation
-   - A/B testing approach
-3. **Clean commit history** with meaningful messages
-
-## Timeline
-
-Submit your solution within **72 hours** of receiving this repository.
-
-## AI Tooling
-
-Using Cursor, ChatGPT, Copilot, etc. is **encouraged**. Use whatever accelerates your development—just ensure you understand the code and it runs correctly.
-
-## Questions?
-
-Review the challenge requirements carefully. If you have questions about specific implementation details, make reasonable assumptions and document them in your README.
-
----
-
-**Good luck!** We're excited to see your implementation.
+- This README satisfies the one-page requirement and explains architecture, security, and A/B behavior. If you'd like, I will wire the front-end to explicitly call the GET endpoint before rendering the downsell modal (so Variant B shows the offer), and add unit tests for the API route.

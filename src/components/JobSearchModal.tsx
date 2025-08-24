@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import useMediaQuery from "@mui/material/useMediaQuery";
+import { DESKTOP_MIN_WIDTH_PX, FONT_DM_SANS_VAR } from "../lib/ui/constants";
 import ResponsiveDialog from "./ResponsiveDialog";
 import MUIDrawer from "./MUIDrawer";
 import CancellationSurveyModal from "./CancellationSurveyModal";
@@ -11,13 +12,13 @@ type Props = {
   visible: boolean;
   onClose: () => void;
   onBack?: () => void;
-  onAccept: () => void;   // CTA: Get 50% off
-  onDecline: () => void;  // Ghost: No thanks (after survey flow)
-  step?: number;          // defaults 1
-  totalSteps?: number;    // defaults 3
+  onAccept: () => void;
+  onDecline: () => void;
+  step?: number;
+  totalSteps?: number;
 };
 
-export default function JobSearchModal({
+function JobSearchModal({
   visible,
   onClose,
   onBack,
@@ -29,7 +30,7 @@ export default function JobSearchModal({
   const [showSurveyModal, setShowSurveyModal] = useState(false);
   const [hideForOfferModal, setHideForOfferModal] = useState(false);
 
-  const isDesktop = useMediaQuery("(min-width:1024px)");
+  const isDesktop = useMediaQuery(`(min-width:${DESKTOP_MIN_WIDTH_PX}px)`);
 
   const handleDecline = () => setShowSurveyModal(true);
   const handleSurveySubmit = (feedback: {
@@ -41,6 +42,18 @@ export default function JobSearchModal({
   };
   const handleNextStep = (reason: string) => {
     console.log("Cancellation reason:", reason);
+    // persist a cancellation draft with reason (user declined downsell)
+    fetch("/api/cancellations", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        subscription_id: "550e8400-e29b-41d4-a716-446655440001",
+        reason,
+        accepted: false,
+        accepted_downsell: false,
+      }),
+    }).catch((e) => console.error("persist reason failed", e));
+
     setShowSurveyModal(false);
     onDecline();
   };
@@ -54,7 +67,7 @@ export default function JobSearchModal({
 
   if (!visible) return null;
 
-  // If the nested offer modal flow is active, render only the survey modal (contains its own offer step).
+  // When the nested offer flow is active render only the survey modal (it contains its own offer step).
   if (hideForOfferModal) {
     return (
       <CancellationSurveyModal
@@ -72,10 +85,8 @@ export default function JobSearchModal({
     );
   }
 
-  // --------- Shared UI bits ---------
   const Stepper = () => (
     <div className="flex items-center justify-start gap-3">
-
       <div className="flex items-center gap-2">
         {Array.from({ length: totalSteps }).map((_, i) => {
           const idx = i + 1;
@@ -94,7 +105,7 @@ export default function JobSearchModal({
       </div>
       <span
         className="text-sm text-gray-600"
-        style={{ fontFamily: "var(--font-dm-sans)" }}
+        style={{ fontFamily: FONT_DM_SANS_VAR }}
       >
         Step {step} of {totalSteps}
       </span>
@@ -105,7 +116,7 @@ export default function JobSearchModal({
     <div className="rounded-[20px] border border-[#C9B7FF] bg-[#EFE4FF]/70 p-4 md:p-5 shadow-sm">
       <h3
         className="text-[26px] md:text-[28px] font-semibold text-gray-900 leading-[1.15]"
-        style={{ fontFamily: "var(--font-dm-sans)" }}
+        style={{ fontFamily: FONT_DM_SANS_VAR }}
       >
         Here’s <u>50% off</u> until you find a job.
       </h3>
@@ -113,7 +124,7 @@ export default function JobSearchModal({
       <div className=" flex items-center justify-center gap-5">
         <div
           className="text-[26px] md:text-[28px] font-extrabold text-[#5D3AF7]"
-          style={{ fontFamily: "var(--font-dm-sans)" }}
+          style={{ fontFamily: FONT_DM_SANS_VAR }}
         >
           $12.50<span className="font-semibold">/month</span>
         </div>
@@ -125,15 +136,12 @@ export default function JobSearchModal({
       <button
         onClick={onAccept}
         className="mt-5 w-full h-[56px] rounded-2xl font-semibold text-white bg-[#28B463] hover:bg-[#24A259] transition-colors"
-        style={{ fontFamily: "var(--font-dm-sans)" }}
+        style={{ fontFamily: FONT_DM_SANS_VAR }}
       >
         Get 50% off
       </button>
 
-      <p
-        className=" text-[15px] italic text-gray-600 text-center"
-        style={{ fontFamily: "var(--font-dm-sans)" }}
-      >
+      <p className=" text-[15px] italic text-gray-600 text-center" style={{ fontFamily: FONT_DM_SANS_VAR }}>
         You won’t be charged until your next billing date.
       </p>
     </div>
@@ -143,14 +151,14 @@ export default function JobSearchModal({
     <div className="max-w-[760px]">
       <h1
         className="text-[44px] font-semibold text-gray-800 leading-[1.1] "
-        style={{ fontFamily: "var(--font-dm-sans)" }}
+        style={{ fontFamily: FONT_DM_SANS_VAR }}
       >
         We built this to help you land the job, this makes it a little easier.
       </h1>
 
       <p
         className="mt-3 text-[20px] text-gray-600"
-        style={{ fontFamily: "var(--font-dm-sans)" }}
+        style={{ fontFamily: FONT_DM_SANS_VAR }}
       >
         We&apos;ve been there and we&apos;re here to help you.
       </p>
@@ -159,11 +167,10 @@ export default function JobSearchModal({
         <OfferCard />
       </div>
 
-      {/* Desktop ghost button */}
       <button
         onClick={handleDecline}
         className="hidden md:block mt-6 w-full h-[56px] rounded-2xl border border-gray-300 bg-white text-gray-800 font-semibold hover:bg-gray-50 transition-colors"
-        style={{ fontFamily: "var(--font-dm-sans)" }}
+        style={{ fontFamily: FONT_DM_SANS_VAR }}
       >
         No thanks
       </button>
@@ -172,7 +179,7 @@ export default function JobSearchModal({
 
   return (
     <>
-      {/* ---------------- Desktop (>=1024px): Dialog ---------------- */}
+  {/* Desktop (>=1024px): Dialog */}
       {isDesktop && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/30"
@@ -192,38 +199,56 @@ export default function JobSearchModal({
             desktopOnly
             title={
               <div className="flex items-center justify-between w-full">
-                {/* Back (left) */}
                 <button
                   onClick={() => (onBack ? onBack() : onClose())}
                   className="flex items-center gap-2 text-gray-700 hover:text-gray-900"
                   aria-label="Back"
                 >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                  <svg
+                    className="w-5 h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M15 19l-7-7 7-7"
+                    />
                   </svg>
-                  <span className="text-sm" style={{ fontFamily: "var(--font-dm-sans)" }}>Back</span>
+                  <span className="text-sm" style={{ fontFamily: FONT_DM_SANS_VAR }}>
+                    Back
+                  </span>
                 </button>
-
-                {/* Center: Title + Stepper */}
                 <div className="flex items-center gap-4">
                   <h3
                     id="offer-title"
                     className="text-lg font-semibold text-gray-900"
-                    style={{ fontFamily: "var(--font-dm-sans)" }}
+                    style={{ fontFamily: FONT_DM_SANS_VAR }}
                   >
                     Subscription Cancellation
                   </h3>
                   <Stepper />
                 </div>
 
-                {/* Close (right) */}
                 <button
                   onClick={onClose}
                   className="p-1.5 text-gray-400 hover:text-gray-600"
                   aria-label="Close"
                 >
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  <svg
+                    className="w-6 h-6"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M6 18L18 6M6 6l12 12"
+                    />
                   </svg>
                 </button>
               </div>
@@ -253,42 +278,38 @@ export default function JobSearchModal({
         </div>
       )}
 
-      {/* ---------------- Mobile (<1024px): Bottom Sheet ---------------- */}
+  {/* Mobile (<1024px): Bottom sheet */}
       {!isDesktop && (
         <MUIDrawer
           open={visible}
           onClose={onClose}
           title="Subscription Cancellation"
-          headerContent={<Stepper />}            // centered below title (matches Figma)
+          headerContent={<Stepper />}
           backButton={{ onBack: onBack ? onBack : onClose, label: "Back" }}
           stickyFooter={
             <button
               onClick={handleDecline}
               className="w-full h-[56px] rounded-2xl border border-gray-300 bg-white text-gray-800 font-semibold hover:bg-gray-50 transition-colors"
-              style={{ fontFamily: "var(--font-dm-sans)" }}
+              style={{ fontFamily: FONT_DM_SANS_VAR }}
             >
               No thanks
             </button>
           }
           maxHeight="min(75dvh,75vh)"
         >
-          {/* Headline */}
           <h1
             className="text-[32px] font-semibold text-gray-800 leading-[1.15]"
-            style={{ fontFamily: "var(--font-dm-sans)" }}
+            style={{ fontFamily: FONT_DM_SANS_VAR }}
           >
-            We built this to help you land the job, this makes it a little easier.
+            We built this to help you land the job, this makes it a little
+            easier.
           </h1>
-
-          {/* Subcopy */}
           <p
             className="mt-3 text-[17px] text-gray-600"
-            style={{ fontFamily: "var(--font-dm-sans)" }}
+            style={{ fontFamily: FONT_DM_SANS_VAR }}
           >
             We&apos;ve been there and we&apos;re here to help you.
           </p>
-
-          {/* Offer card */}
           <div className="mt-6">
             <OfferCard />
           </div>
@@ -311,3 +332,5 @@ export default function JobSearchModal({
     </>
   );
 }
+
+export default React.memo(JobSearchModal);

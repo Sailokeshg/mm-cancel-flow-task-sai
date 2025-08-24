@@ -3,6 +3,7 @@
 import React from "react";
 import Image from "next/image";
 import useMediaQuery from "@mui/material/useMediaQuery";
+import { DESKTOP_MIN_WIDTH_PX, FONT_DM_SANS_VAR } from "../lib/ui/constants";
 import ResponsiveDialog from "./ResponsiveDialog";
 import MUIDrawer from "./MUIDrawer";
 
@@ -12,12 +13,8 @@ type Props = {
   onLandDreamRole: () => void;
 };
 
-export default function SubscriptionOfferModal({
-  visible,
-  onClose,
-  onLandDreamRole,
-}: Props) {
-  const isDesktop = useMediaQuery("(min-width:1024px)");
+function SubscriptionOfferModal({ visible, onClose, onLandDreamRole }: Props) {
+  const isDesktop = useMediaQuery(`(min-width:${DESKTOP_MIN_WIDTH_PX}px)`);
 
   if (!visible) return null;
 
@@ -46,7 +43,7 @@ export default function SubscriptionOfferModal({
                 <h3
                   id="subscription-title"
                   className="text-lg font-semibold text-gray-900"
-                  style={{ fontFamily: "var(--font-dm-sans)" }}
+                  style={{ fontFamily: FONT_DM_SANS_VAR }}
                 >
                   Subscription Continued
                 </h3>
@@ -55,8 +52,18 @@ export default function SubscriptionOfferModal({
                   className="absolute right-0 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
                   aria-label="Close modal"
                 >
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  <svg
+                    className="w-6 h-6"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M6 18L18 6M6 6l12 12"
+                    />
                   </svg>
                 </button>
               </div>
@@ -68,30 +75,35 @@ export default function SubscriptionOfferModal({
                 <div className="max-w-[1000px]">
                   <h1
                     className="text-4xl font-semibold text-gray-800 leading-tight -mt-4"
-                    style={{ fontFamily: "var(--font-dm-sans)" }}
+                    style={{ fontFamily: FONT_DM_SANS_VAR }}
                   >
                     Great choice, mate!
                   </h1>
 
                   <p
                     className="text-4xl font-semibold text-gray-800 mt-3"
-                    style={{ fontFamily: "var(--font-dm-sans)" }}
+                    style={{ fontFamily: FONT_DM_SANS_VAR }}
                   >
                     You&apos;re still on the path to your dream role.{" "}
-                    <span className="text-[#8B5CF6]">Let&apos;s make it happen together!</span>
+                    <span className="text-[#8B5CF6]">
+                      Let&apos;s make it happen together!
+                    </span>
                   </p>
 
                   <div
                     className="text-gray-600 text-base md:text-[17px] leading-relaxed mt-4 space-y-1"
-                    style={{ fontFamily: "var(--font-dm-sans)" }}
+                    style={{ fontFamily: FONT_DM_SANS_VAR }}
                   >
                     <p>You&apos;ve got XX days left on your current plan.</p>
-                    <p>Starting from XX date, your monthly payment will be $12.50.</p>
+                    <p>
+                      Starting from XX date, your monthly payment will be
+                      $12.50.
+                    </p>
                   </div>
 
                   <p
                     className="text-gray-500 text-sm md:text-[15px] italic mt-3"
-                    style={{ fontFamily: "var(--font-dm-sans)" }}
+                    style={{ fontFamily: FONT_DM_SANS_VAR }}
                   >
                     You can cancel anytime before then.
                   </p>
@@ -100,7 +112,7 @@ export default function SubscriptionOfferModal({
                     <button
                       onClick={onLandDreamRole}
                       className="w-full h-[56px] rounded-2xl bg-[#8B5CF6] hover:bg-[#7C3AED] transition-all text-white font-semibold focus:outline-none focus:ring-2 focus:ring-[#8B5CF6] focus:ring-offset-2"
-                      style={{ fontFamily: "var(--font-dm-sans)" }}
+                      style={{ fontFamily: FONT_DM_SANS_VAR }}
                     >
                       Land your dream role
                     </button>
@@ -140,7 +152,7 @@ export default function SubscriptionOfferModal({
               <button
                 onClick={onLandDreamRole}
                 className="w-full h-[56px] rounded-2xl bg-[#8B5CF6] hover:bg-[#7C3AED] transition-all text-white font-semibold"
-                style={{ fontFamily: "var(--font-dm-sans)" }}
+                style={{ fontFamily: FONT_DM_SANS_VAR }}
               >
                 Land your dream role
               </button>
@@ -163,22 +175,24 @@ export default function SubscriptionOfferModal({
             {/* Copy */}
             <h1
               className="text-[32px] font-semibold text-gray-800 leading-[1.15] mt-5"
-              style={{ fontFamily: "var(--font-dm-sans)" }}
+              style={{ fontFamily: FONT_DM_SANS_VAR }}
             >
               Great choice, mate!
             </h1>
 
             <p
               className="text-[28px] font-semibold text-gray-800 mt-3 leading-[1.2]"
-              style={{ fontFamily: "var(--font-dm-sans)" }}
+              style={{ fontFamily: FONT_DM_SANS_VAR }}
             >
               You&apos;re still on the path to your dream role.{" "}
-              <span className="text-[#8B5CF6]">Let&apos;s make it happen together!</span>
+              <span className="text-[#8B5CF6]">
+                Let&apos;s make it happen together!
+              </span>
             </p>
 
             <div
               className="text-gray-600 text-[15px] leading-relaxed mt-4 space-y-1"
-              style={{ fontFamily: "var(--font-dm-sans)" }}
+              style={{ fontFamily: FONT_DM_SANS_VAR }}
             >
               <p>You&apos;ve got XX days left on your current plan.</p>
               <p>Starting from XX date, your monthly payment will be $12.50.</p>
@@ -186,7 +200,7 @@ export default function SubscriptionOfferModal({
 
             <p
               className="text-gray-500 text-[13px] italic mt-3"
-              style={{ fontFamily: "var(--font-dm-sans)" }}
+              style={{ fontFamily: FONT_DM_SANS_VAR }}
             >
               You can cancel anytime before then.
             </p>
@@ -196,3 +210,5 @@ export default function SubscriptionOfferModal({
     </>
   );
 }
+
+export default React.memo(SubscriptionOfferModal);

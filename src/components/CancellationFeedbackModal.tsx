@@ -1,10 +1,11 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import Image from "next/image";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import ResponsiveDialog from "./ResponsiveDialog";
 import MUIDrawer from "./MUIDrawer";
+import { DESKTOP_MIN_WIDTH_PX, FONT_DM_SANS_VAR } from "../lib/ui/constants";
 
 type Props = {
   visible: boolean;
@@ -14,67 +15,58 @@ type Props = {
   totalSteps?: number; // default 3
 };
 
-export default function CancellationFeedbackModal({
-  visible,
-  onClose,
-  onBack,
-  onSubmit,
-  totalSteps = 3,
-}: Props) {
-  // Desktop breakpoint aligned with Tailwind `lg`
-  const isDesktop = useMediaQuery("(min-width:1024px)");
-
-  // ---- This screen is Step 2 of 3 ----
-  const STEP_INDEX = 2;
-
-  // Feedback state
-  const [feedback, setFeedback] = useState("");
-  const charCount = feedback.trim().length;
-  const MIN = 25;
-  const isValid = charCount >= MIN;
-
-  if (!visible) return null;
-
-  // Continue handler
-  const handleContinue = () => {
-    if (!isValid) return;
-    if (onSubmit) {
-      onSubmit(feedback.trim());
-    } else {
-      onClose();
-    }
-  };
-
-  // ======= Stepper UI (left‑aligned) =======
-  const Stepper = () => (
+/* ---------- Extracted: Stepper (stable identity) ---------- */
+function Stepper({
+  totalSteps,
+  stepIndex,
+  fontFamilyVar,
+}: {
+  totalSteps: number;
+  stepIndex: number;
+  fontFamilyVar: string;
+}) {
+  return (
     <div className="flex items-center justify-start gap-3">
       <div className="flex items-center gap-2">
         {Array.from({ length: totalSteps }).map((_, i) => {
           const idx = i + 1;
-          const isDoneOrCurrent = idx <= STEP_INDEX;
+          const isDoneOrCurrent = idx <= stepIndex;
           return (
             <span
               key={idx}
               className={[
                 "h-2 rounded-full transition-[width,background-color]",
-                idx === STEP_INDEX ? "w-8" : "w-5",
+                idx === stepIndex ? "w-8" : "w-5",
                 isDoneOrCurrent ? "bg-green-500" : "bg-gray-300",
               ].join(" ")}
             />
           );
         })}
       </div>
-      <span
-        className="text-sm text-gray-600"
-        style={{ fontFamily: "var(--font-dm-sans)" }}
-      >
-        Step {STEP_INDEX} of {totalSteps}
+      <span className="text-sm text-gray-600" style={{ fontFamily: fontFamilyVar }}>
+        Step {stepIndex} of {totalSteps}
       </span>
     </div>
   );
+}
 
-  // ==== Shared left content (desktop body) ====
-  const LeftContent = () => (
+/* ---------- Extracted: LeftContent (stable identity) ---------- */
+function LeftContent({
+  feedback,
+  setFeedback,
+  charCount,
+  MIN,
+  isValid,
+  handleContinue,
+}: {
+  feedback: string;
+  setFeedback: (s: string) => void;
+  charCount: number;
+  MIN: number;
+  isValid: boolean;
+  handleContinue: () => void;
+}) {
+  return (
     <div className="max-w-[760px]">
       <h1
         className="text-[32px] md:text-[42px] font-semibold text-gray-800 leading-tight"
@@ -127,6 +119,38 @@ export default function CancellationFeedbackModal({
       </button>
     </div>
   );
+}
+
+function CancellationFeedbackModal({
+  visible,
+  onClose,
+  onBack,
+  onSubmit,
+  totalSteps = 3,
+}: Props) {
+  // Desktop breakpoint aligned with Tailwind `lg`
+  const isDesktop = useMediaQuery(`(min-width:${DESKTOP_MIN_WIDTH_PX}px)`);
+
+  // ---- This screen is Step 2 of 3 ----
+  const STEP_INDEX = 2;
+
+  // Feedback state
+  const [feedback, setFeedback] = useState("");
+  const charCount = feedback.trim().length;
+  const MIN = 25;
+  const isValid = charCount >= MIN;
+
+  // Continue handler (stable reference is nice-to-have)
+  const handleContinue = useCallback(() => {
+    if (!isValid) return;
+    if (onSubmit) {
+      onSubmit(feedback.trim());
+    } else {
+      onClose();
+    }
+  }, [isValid, onSubmit, feedback, onClose]);
+
+  if (!visible) return null;
 
   return (
     <>
@@ -168,10 +192,7 @@ export default function CancellationFeedbackModal({
                       d="M15 19l-7-7 7-7"
                     />
                   </svg>
-                  <span
-                    className="text-sm"
-                    style={{ fontFamily: "var(--font-dm-sans)" }}
-                  >
+                  <span className="text-sm" style={{ fontFamily: FONT_DM_SANS_VAR }}>
                     Back
                   </span>
                 </button>
@@ -180,11 +201,15 @@ export default function CancellationFeedbackModal({
                   <h3
                     id="feedback-title"
                     className="text-base md:text-lg font-semibold text-gray-900"
-                    style={{ fontFamily: "var(--font-dm-sans)" }}
+                    style={{ fontFamily: FONT_DM_SANS_VAR }}
                   >
                     Subscription Cancellation
                   </h3>
-                  <Stepper />
+                  <Stepper
+                    totalSteps={totalSteps}
+                    stepIndex={STEP_INDEX}
+                    fontFamilyVar={FONT_DM_SANS_VAR}
+                  />
                 </div>
 
                 <button
@@ -210,7 +235,15 @@ export default function CancellationFeedbackModal({
 
               <div className="grid grid-cols-1 lg:grid-cols-[1.1fr_0.9fr] gap-8 p-6 md:p-10">
                 <div className="max-w-[1000px]">
-                  <LeftContent />
+                  <LeftContent
+                    feedback={feedback}
+                    setFeedback={setFeedback}
+                    charCount={charCount}
+                    MIN={MIN}
+                    isValid={isValid}
+                    handleContinue={handleContinue}
+
+                  />
                 </div>
 
                 <div className="flex items-start justify-center">
@@ -221,7 +254,7 @@ export default function CancellationFeedbackModal({
                       fill
                       className="object-cover"
                       priority
-                      sizes="(min-width:1024px) 560px, 100vw"
+                      sizes={`(min-width:${DESKTOP_MIN_WIDTH_PX}px) 560px, 100vw`}
                     />
                   </div>
                 </div>
@@ -238,7 +271,13 @@ export default function CancellationFeedbackModal({
           onClose={onClose}
           title="Subscription Cancellation"
           showGrabHandle={false}
-          headerContent={<Stepper />}
+          headerContent={
+            <Stepper
+              totalSteps={totalSteps}
+              stepIndex={STEP_INDEX}
+              fontFamilyVar={FONT_DM_SANS_VAR}
+            />
+          }
           backButton={{
             onBack: onBack ? onBack : onClose,
             label: "Back",
@@ -254,7 +293,7 @@ export default function CancellationFeedbackModal({
                   ? "bg-[#5D3AF7] text-white hover:bg-[#4F2FF3]"
                   : "bg-gray-100 text-gray-400 cursor-not-allowed",
               ].join(" ")}
-              style={{ fontFamily: "var(--font-dm-sans)" }}
+              style={{ fontFamily: FONT_DM_SANS_VAR }}
             >
               Continue
             </button>
@@ -263,7 +302,7 @@ export default function CancellationFeedbackModal({
           {/* Mobile body — matches Figma */}
           <h1
             className="text-[28px] font-semibold text-gray-800 leading-tight"
-            style={{ fontFamily: "var(--font-dm-sans)" }}
+            style={{ fontFamily: FONT_DM_SANS_VAR }}
           >
             What&apos;s one thing you wish we could&apos;ve helped you with?
           </h1>
@@ -273,7 +312,7 @@ export default function CancellationFeedbackModal({
 
           <p
             className="text-[16px] text-gray-600"
-            style={{ fontFamily: "var(--font-dm-sans)" }}
+            style={{ fontFamily: FONT_DM_SANS_VAR }}
           >
             We&apos;re always looking to improve, your thoughts can help us make
             Migrate Mate more useful for others.*
@@ -285,11 +324,11 @@ export default function CancellationFeedbackModal({
                 value={feedback}
                 onChange={(e) => setFeedback(e.target.value)}
                 className="w-full h-48 rounded-2xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-300 p-4 text-gray-800"
-                style={{ fontFamily: "var(--font-dm-sans)" }}
+                style={{ fontFamily: FONT_DM_SANS_VAR }}
               />
               <div
                 className="absolute bottom-2 right-3 text-sm text-gray-500"
-                style={{ fontFamily: "var(--font-dm-sans)" }}
+                style={{ fontFamily: FONT_DM_SANS_VAR }}
               >
                 Min {MIN} characters ({charCount}/{MIN})
               </div>
@@ -300,3 +339,5 @@ export default function CancellationFeedbackModal({
     </>
   );
 }
+
+export default React.memo(CancellationFeedbackModal);
