@@ -8,11 +8,11 @@ import {
   FONT_DM_SANS_VAR,
   BACKDROP_RGBA,
   BACKDROP_BLUR,
-} from "../lib/ui/constants";
-import IconButton from "@mui/material/IconButton";
-import CloseIcon from "@mui/icons-material/Close";
+} from "../../lib/ui/constants";
 import ResponsiveDialog from "./ResponsiveDialog";
-import MUIDrawer from "./MUIDrawer";
+import MUIDrawer from "../ui/MUIDrawer";
+import ModalHeader from "../ui/ModalHeader";
+import PrimaryButton from "../buttons/PrimaryButton";
 
 type Props = {
   visible: boolean;
@@ -34,7 +34,7 @@ export default function CancellationModal({
 
   return (
     <>
-  {/* Desktop dialog */}
+      {/* Desktop dialog */}
       {isDesktop && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center "
@@ -58,35 +58,10 @@ export default function CancellationModal({
             paperSx={{ borderRadius: 6 }}
             desktopOnly // prevents portal on mobile
             title={
-              <div
-                style={{
-                  position: "relative",
-                  width: "100%",
-                  paddingRight: 56,
-                }}
-              >
-                <h3
-                  id="cancel-title"
-                  className="text-lg font-semibold text-gray-900 flex justify-center"
-                  style={{ fontFamily: FONT_DM_SANS_VAR, margin: 0 }}
-                >
-                  Subscription Cancellation
-                </h3>
-
-                <IconButton
-                  onClick={onClose}
-                  aria-label="Close"
-                  size="small"
-                  style={{
-                    position: "absolute",
-                    right: 12,
-                    top: 2,
-                    color: "#6B7280",
-                  }}
-                >
-                  <CloseIcon fontSize="small" />
-                </IconButton>
-              </div>
+              <ModalHeader
+                title="Subscription Cancellation"
+                onClose={onClose}
+              />
             }
           >
             <div className="grid grid-cols-1 lg:grid-cols-[1.1fr_0.9fr] gap-8 p-6 md:p-10">
@@ -119,21 +94,21 @@ export default function CancellationModal({
                   <hr className="my-6 border-t border-gray-200" />
 
                   <div className="space-y-4">
-                    <button
+                    <PrimaryButton
                       onClick={onJobFound}
-                      className="w-full max-w-[560px] py-4 rounded-2xl border border-gray-300 bg-white shadow-sm hover:shadow-md hover:border-gray-400 transition-all text-gray-800 font-semibold focus:outline-none focus:ring-2 focus:ring-gray-300"
-                      style={{ fontFamily: FONT_DM_SANS_VAR }}
+                      className="max-w-[560px]"
+                      variant="ghost"
                     >
                       Yes, I&apos;ve found a job
-                    </button>
+                    </PrimaryButton>
 
-                    <button
+                    <PrimaryButton
                       onClick={onStillLooking}
-                      className="w-full max-w-[560px] py-4 rounded-2xl border border-gray-300 bg-white shadow-sm hover:shadow-md hover:border-gray-400 transition-all text-gray-800 font-semibold focus:outline-none focus:ring-2 focus:ring-gray-300"
-                      style={{ fontFamily: FONT_DM_SANS_VAR }}
+                      className="max-w-[560px]"
+                      variant="ghost"
                     >
                       Not yet – I&apos;m still looking
-                    </button>
+                    </PrimaryButton>
                   </div>
                 </div>
               </div>
@@ -155,7 +130,7 @@ export default function CancellationModal({
         </div>
       )}
 
-  {/* Mobile bottom sheet */}
+      {/* Mobile bottom sheet */}
       {!isDesktop && (
         <MUIDrawer
           open={visible}

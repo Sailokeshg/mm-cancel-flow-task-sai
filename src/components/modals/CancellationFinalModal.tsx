@@ -4,8 +4,10 @@ import React from "react";
 import Image from "next/image";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import ResponsiveDialog from "./ResponsiveDialog";
-import MUIDrawer from "./MUIDrawer";
-import { DESKTOP_MIN_WIDTH_PX, FONT_DM_SANS_VAR } from "../lib/ui/constants";
+import MUIDrawer from "../ui/MUIDrawer";
+import ModalStepper from "../ui/ModalStepper";
+import ModalHeader from "../ui/ModalHeader";
+import { DESKTOP_MIN_WIDTH_PX, FONT_DM_SANS_VAR } from "../../lib/ui/constants";
 
 type Props = {
   visible: boolean;
@@ -19,20 +21,9 @@ function CancellationFinalModal({ visible, onClose, totalSteps = 3 }: Props) {
   if (!visible) return null;
 
   // Stepper (all steps complete)
+  // Completed stepper uses shared component with stepIndex == totalSteps
   const Stepper = () => (
-    <div className="flex items-center justify-start gap-3">
-      <div className="flex items-center gap-2">
-        {Array.from({ length: totalSteps }).map((_, i) => (
-          <span key={i} className="h-2 w-5 rounded-full bg-green-500" />
-        ))}
-      </div>
-      <span
-        className="text-sm text-gray-600"
-        style={{ fontFamily: FONT_DM_SANS_VAR }}
-      >
-        Completed
-      </span>
-    </div>
+    <ModalStepper totalSteps={totalSteps} stepIndex={totalSteps} />
   );
 
   // Desktop content
@@ -134,7 +125,7 @@ function CancellationFinalModal({ visible, onClose, totalSteps = 3 }: Props) {
 
   return (
     <>
-  {/* Desktop dialog */}
+      {/* Desktop dialog */}
       {isDesktop && (
         <div
           className="fixed inset-0 z-[10] flex items-center justify-center bg-black/50"
@@ -153,64 +144,21 @@ function CancellationFinalModal({ visible, onClose, totalSteps = 3 }: Props) {
             paperSx={{ borderRadius: 6 }}
             desktopOnly
             title={
-              <div className="w-full flex items-center justify-between">
-                <button
-                  onClick={onClose}
-                  className="flex items-center gap-2 text-gray-700 hover:text-gray-900"
-                  aria-label="Back"
-                >
-                  <svg
-                    className="w-5 h-5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M15 19l-7-7 7-7"
-                    />
-                  </svg>
-                  <span
-                    className="text-sm"
-                    style={{ fontFamily: FONT_DM_SANS_VAR }}
-                  >
-                    Back
-                  </span>
-                </button>
-
-                <div className="flex items-center gap-4">
-                  <h3
-                    id="final-completion-title"
-                    className="text-base md:text-lg font-semibold text-gray-900"
-                    style={{ fontFamily: FONT_DM_SANS_VAR }}
-                  >
-                    Subscription Cancelled
-                  </h3>
-                  <Stepper />
-                </div>
-
-                <button
-                  onClick={onClose}
-                  className="p-1.5 text-gray-400 hover:text-gray-600"
-                  aria-label="Close"
-                >
-                  <svg
-                    className="w-6 h-6"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M6 18L18 6M6 6l12 12"
-                    />
-                  </svg>
-                </button>
-              </div>
+              <ModalHeader
+                title={
+                  <>
+                    <span
+                      className="text-base md:text-lg font-semibold text-gray-900"
+                      style={{ fontFamily: FONT_DM_SANS_VAR }}
+                    >
+                      Subscription Cancelled
+                    </span>
+                    <Stepper />
+                  </>
+                }
+                onClose={onClose}
+                onBack={onClose}
+              />
             }
           >
             <div className="grid grid-cols-1 lg:grid-cols-[1.1fr_0.9fr] gap-8 p-6 md:p-10">
@@ -237,7 +185,7 @@ function CancellationFinalModal({ visible, onClose, totalSteps = 3 }: Props) {
         </div>
       )}
 
-  {/* Mobile drawer */}
+      {/* Mobile drawer */}
       {!isDesktop && (
         <MUIDrawer
           open={visible}

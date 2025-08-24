@@ -3,9 +3,9 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import useMediaQuery from "@mui/material/useMediaQuery";
-import { DESKTOP_MIN_WIDTH_PX, FONT_DM_SANS_VAR } from "../lib/ui/constants";
-import ResponsiveDialog from "./ResponsiveDialog";
-import MUIDrawer from "./MUIDrawer";
+import { DESKTOP_MIN_WIDTH_PX, FONT_DM_SANS_VAR } from "../../lib/ui/constants";
+import ResponsiveDialog from "./ResponsiveDialog" 
+import MUIDrawer from "../ui/MUIDrawer";
 
 type Props = {
   visible: boolean;
@@ -82,7 +82,7 @@ function CancellationVisaSupportModal({
           : "You landed the job! That’s what we live for."}
       </h1>
 
-  {/* subtle divider */}
+      {/* subtle divider */}
       <div className="mt-3 mb-4 h-px bg-gray-200" />
 
       <p
@@ -92,7 +92,7 @@ function CancellationVisaSupportModal({
         Is your company providing an immigration lawyer to help with your visa?*
       </p>
 
-  {/* Radio group */}
+      {/* Radio group */}
       <fieldset className="mt-4">
         <legend className="sr-only">Company provided immigration lawyer</legend>
         <div className="space-y-4">
@@ -130,7 +130,7 @@ function CancellationVisaSupportModal({
         </div>
       </fieldset>
 
-  {/* Additional text and visa input when No is selected */}
+      {/* Additional text and visa input when No is selected */}
       {answer === false && (
         <div className="mt-6">
           <p
@@ -157,7 +157,7 @@ function CancellationVisaSupportModal({
         </div>
       )}
 
-  {/* Visa type input when Yes is selected */}
+      {/* Visa type input when Yes is selected */}
       {answer === true && (
         <div className="mt-6">
           <label
@@ -197,7 +197,7 @@ function CancellationVisaSupportModal({
         </div>
       )}
 
-  {/* Divider + Complete (desktop) */}
+      {/* Divider + Complete (desktop) */}
       <hr className="hidden md:block my-6 border-gray-200" />
       <button
         onClick={handleComplete}
@@ -217,7 +217,7 @@ function CancellationVisaSupportModal({
 
   return (
     <>
-  {/* Desktop dialog */}
+      {/* Desktop dialog */}
       {isDesktop && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/30"
@@ -321,7 +321,7 @@ function CancellationVisaSupportModal({
         </div>
       )}
 
-  {/* Mobile drawer */}
+      {/* Mobile drawer */}
       {!isDesktop && (
         <MUIDrawer
           open={visible}
