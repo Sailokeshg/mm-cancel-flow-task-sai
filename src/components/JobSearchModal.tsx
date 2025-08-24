@@ -11,10 +11,10 @@ type Props = {
   visible: boolean;
   onClose: () => void;
   onBack?: () => void;
-  onAccept: () => void;   // CTA: Get 50% off
-  onDecline: () => void;  // Ghost: No thanks (after survey flow)
-  step?: number;          // defaults 1
-  totalSteps?: number;    // defaults 3
+  onAccept: () => void; // CTA: Get 50% off
+  onDecline: () => void; // Ghost: No thanks (after survey flow)
+  step?: number; // defaults 1
+  totalSteps?: number; // defaults 3
 };
 
 export default function JobSearchModal({
@@ -41,6 +41,18 @@ export default function JobSearchModal({
   };
   const handleNextStep = (reason: string) => {
     console.log("Cancellation reason:", reason);
+    // persist a cancellation draft with reason (user declined downsell)
+    fetch("/api/cancellations", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        subscription_id: "550e8400-e29b-41d4-a716-446655440001",
+        reason,
+        accepted: false,
+        accepted_downsell: false,
+      }),
+    }).catch((e) => console.error("persist reason failed", e));
+
     setShowSurveyModal(false);
     onDecline();
   };
@@ -75,7 +87,6 @@ export default function JobSearchModal({
   // --------- Shared UI bits ---------
   const Stepper = () => (
     <div className="flex items-center justify-start gap-3">
-
       <div className="flex items-center gap-2">
         {Array.from({ length: totalSteps }).map((_, i) => {
           const idx = i + 1;
@@ -198,10 +209,25 @@ export default function JobSearchModal({
                   className="flex items-center gap-2 text-gray-700 hover:text-gray-900"
                   aria-label="Back"
                 >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                  <svg
+                    className="w-5 h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M15 19l-7-7 7-7"
+                    />
                   </svg>
-                  <span className="text-sm" style={{ fontFamily: "var(--font-dm-sans)" }}>Back</span>
+                  <span
+                    className="text-sm"
+                    style={{ fontFamily: "var(--font-dm-sans)" }}
+                  >
+                    Back
+                  </span>
                 </button>
 
                 {/* Center: Title + Stepper */}
@@ -222,8 +248,18 @@ export default function JobSearchModal({
                   className="p-1.5 text-gray-400 hover:text-gray-600"
                   aria-label="Close"
                 >
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  <svg
+                    className="w-6 h-6"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M6 18L18 6M6 6l12 12"
+                    />
                   </svg>
                 </button>
               </div>
@@ -259,7 +295,7 @@ export default function JobSearchModal({
           open={visible}
           onClose={onClose}
           title="Subscription Cancellation"
-          headerContent={<Stepper />}            // centered below title (matches Figma)
+          headerContent={<Stepper />} // centered below title (matches Figma)
           backButton={{ onBack: onBack ? onBack : onClose, label: "Back" }}
           stickyFooter={
             <button
@@ -277,7 +313,8 @@ export default function JobSearchModal({
             className="text-[32px] font-semibold text-gray-800 leading-[1.15]"
             style={{ fontFamily: "var(--font-dm-sans)" }}
           >
-            We built this to help you land the job, this makes it a little easier.
+            We built this to help you land the job, this makes it a little
+            easier.
           </h1>
 
           {/* Subcopy */}

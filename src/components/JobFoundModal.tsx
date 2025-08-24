@@ -119,9 +119,24 @@ export default function JobFoundModal({ visible, onClose, onBack }: Props) {
         visible
         onBack={() => goToStep(2)}
         onClose={onClose}
-        onComplete={(companyProvidesLawyer: boolean) => {
-          // If company provides lawyer (Yes), show processed modal
-          // If company doesn't provide lawyer (No), show completion modal
+        onComplete={async (companyProvidesLawyer: boolean) => {
+          // Persist cancellation to backend for dev (uses mock user + seeded subscription)
+          try {
+            await fetch("/api/cancellations", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                // TODO: replace with real subscription id when available
+                subscription_id: "550e8400-e29b-41d4-a716-446655440001",
+                reason: null,
+                accepted: true,
+                accepted_downsell: false,
+              }),
+            });
+          } catch (e) {
+            console.error("Failed to persist cancellation", e);
+          }
+
           if (companyProvidesLawyer) {
             setShowProcessedModal(true);
           } else {
