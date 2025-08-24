@@ -67,7 +67,7 @@ function JobSearchModal({
 
   if (!visible) return null;
 
-  // If the nested offer modal flow is active, render only the survey modal (contains its own offer step).
+  // When the nested offer flow is active render only the survey modal (it contains its own offer step).
   if (hideForOfferModal) {
     return (
       <CancellationSurveyModal
@@ -85,7 +85,6 @@ function JobSearchModal({
     );
   }
 
-  // --------- Shared UI bits ---------
   const Stepper = () => (
     <div className="flex items-center justify-start gap-3">
       <div className="flex items-center gap-2">
@@ -142,10 +141,7 @@ function JobSearchModal({
         Get 50% off
       </button>
 
-      <p
-        className=" text-[15px] italic text-gray-600 text-center"
-        style={{ fontFamily: FONT_DM_SANS_VAR }}
-      >
+      <p className=" text-[15px] italic text-gray-600 text-center" style={{ fontFamily: FONT_DM_SANS_VAR }}>
         You won’t be charged until your next billing date.
       </p>
     </div>
@@ -171,7 +167,6 @@ function JobSearchModal({
         <OfferCard />
       </div>
 
-      {/* Desktop ghost button */}
       <button
         onClick={handleDecline}
         className="hidden md:block mt-6 w-full h-[56px] rounded-2xl border border-gray-300 bg-white text-gray-800 font-semibold hover:bg-gray-50 transition-colors"
@@ -184,7 +179,7 @@ function JobSearchModal({
 
   return (
     <>
-      {/* ---------------- Desktop (>=1024px): Dialog ---------------- */}
+  {/* Desktop (>=1024px): Dialog */}
       {isDesktop && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/30"
@@ -204,7 +199,6 @@ function JobSearchModal({
             desktopOnly
             title={
               <div className="flex items-center justify-between w-full">
-                {/* Back (left) */}
                 <button
                   onClick={() => (onBack ? onBack() : onClose())}
                   className="flex items-center gap-2 text-gray-700 hover:text-gray-900"
@@ -223,15 +217,10 @@ function JobSearchModal({
                       d="M15 19l-7-7 7-7"
                     />
                   </svg>
-                  <span
-                    className="text-sm"
-                    style={{ fontFamily: FONT_DM_SANS_VAR }}
-                  >
+                  <span className="text-sm" style={{ fontFamily: FONT_DM_SANS_VAR }}>
                     Back
                   </span>
                 </button>
-
-                {/* Center: Title + Stepper */}
                 <div className="flex items-center gap-4">
                   <h3
                     id="offer-title"
@@ -243,7 +232,6 @@ function JobSearchModal({
                   <Stepper />
                 </div>
 
-                {/* Close (right) */}
                 <button
                   onClick={onClose}
                   className="p-1.5 text-gray-400 hover:text-gray-600"
@@ -290,13 +278,13 @@ function JobSearchModal({
         </div>
       )}
 
-      {/* ---------------- Mobile (<1024px): Bottom Sheet ---------------- */}
+  {/* Mobile (<1024px): Bottom sheet */}
       {!isDesktop && (
         <MUIDrawer
           open={visible}
           onClose={onClose}
           title="Subscription Cancellation"
-          headerContent={<Stepper />} // centered below title (matches Figma)
+          headerContent={<Stepper />}
           backButton={{ onBack: onBack ? onBack : onClose, label: "Back" }}
           stickyFooter={
             <button
@@ -309,7 +297,6 @@ function JobSearchModal({
           }
           maxHeight="min(75dvh,75vh)"
         >
-          {/* Headline */}
           <h1
             className="text-[32px] font-semibold text-gray-800 leading-[1.15]"
             style={{ fontFamily: FONT_DM_SANS_VAR }}
@@ -317,16 +304,12 @@ function JobSearchModal({
             We built this to help you land the job, this makes it a little
             easier.
           </h1>
-
-          {/* Subcopy */}
           <p
             className="mt-3 text-[17px] text-gray-600"
             style={{ fontFamily: FONT_DM_SANS_VAR }}
           >
             We&apos;ve been there and we&apos;re here to help you.
           </p>
-
-          {/* Offer card */}
           <div className="mt-6">
             <OfferCard />
           </div>

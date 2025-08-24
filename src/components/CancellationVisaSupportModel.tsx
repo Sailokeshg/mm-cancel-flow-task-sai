@@ -26,7 +26,7 @@ function CancellationVisaSupportModal({
 }: Props) {
   const isDesktop = useMediaQuery(`(min-width:${DESKTOP_MIN_WIDTH_PX}px)`);
 
-  // ---- This screen is Step 3 of 3 ----
+  // Step 3 of 3
   const STEP_INDEX = 3;
 
   // Selection state
@@ -41,7 +41,7 @@ function CancellationVisaSupportModal({
     if (onComplete && answer !== null) onComplete(answer);
   };
 
-  // ======= Stepper UI (greens for progress like Figma) =======
+  // Stepper UI
   const Stepper = () => (
     <div className="flex items-center justify-start gap-3">
       <div className="flex items-center gap-2">
@@ -70,7 +70,7 @@ function CancellationVisaSupportModal({
     </div>
   );
 
-  // ==== Left/main content (desktop body) ====
+  // Left/main content (desktop)
   const LeftContent = () => (
     <div className="max-w-[760px]">
       <h1
@@ -82,7 +82,7 @@ function CancellationVisaSupportModal({
           : "You landed the job! That’s what we live for."}
       </h1>
 
-      {/* one subtle divider per Figma */}
+  {/* subtle divider */}
       <div className="mt-3 mb-4 h-px bg-gray-200" />
 
       <p
@@ -92,7 +92,7 @@ function CancellationVisaSupportModal({
         Is your company providing an immigration lawyer to help with your visa?*
       </p>
 
-      {/* Radio group */}
+  {/* Radio group */}
       <fieldset className="mt-4">
         <legend className="sr-only">Company provided immigration lawyer</legend>
         <div className="space-y-4">
@@ -130,7 +130,7 @@ function CancellationVisaSupportModal({
         </div>
       </fieldset>
 
-      {/* Additional text and visa input when No is selected */}
+  {/* Additional text and visa input when No is selected */}
       {answer === false && (
         <div className="mt-6">
           <p
@@ -157,7 +157,7 @@ function CancellationVisaSupportModal({
         </div>
       )}
 
-      {/* Visa type input when Yes is selected */}
+  {/* Visa type input when Yes is selected */}
       {answer === true && (
         <div className="mt-6">
           <label
@@ -197,7 +197,7 @@ function CancellationVisaSupportModal({
         </div>
       )}
 
-      {/* Divider + Complete (desktop) */}
+  {/* Divider + Complete (desktop) */}
       <hr className="hidden md:block my-6 border-gray-200" />
       <button
         onClick={handleComplete}
@@ -217,7 +217,7 @@ function CancellationVisaSupportModal({
 
   return (
     <>
-      {/* ===== Desktop dialog (renders ONLY on desktop) ===== */}
+  {/* Desktop dialog */}
       {isDesktop && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/30"
@@ -236,7 +236,7 @@ function CancellationVisaSupportModal({
             paperSx={{ borderRadius: 6 }}
           >
             <div className="relative">
-              {/* Header with Back, Title + Stepper, Close */}
+              {/* Header: Back, Title + Stepper, Close */}
               <div className="w-full px-5 md:px-6 py-4 border-b border-gray-200 flex items-center justify-between">
                 <button
                   onClick={() => (onBack ? onBack() : onClose())}
@@ -321,8 +321,7 @@ function CancellationVisaSupportModal({
         </div>
       )}
 
-      {/* ===== Mobile drawer (renders on mobile/tablet) ===== */}
-      {/* ===== Mobile drawer (renders on mobile/tablet) ===== */}
+  {/* Mobile drawer */}
       {!isDesktop && (
         <MUIDrawer
           open={visible}
@@ -348,7 +347,7 @@ function CancellationVisaSupportModal({
             </button>
           }
         >
-          {/* Heading now matches desktop logic */}
+          {/* Heading */}
           <h1
             className="text-[28px] font-semibold text-gray-800 leading-tight"
             style={{ fontFamily: FONT_DM_SANS_VAR }}

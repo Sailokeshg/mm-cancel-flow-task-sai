@@ -28,7 +28,7 @@ function CancellationReasonModal({
   step = 3,
   totalSteps = 3,
 }: Props) {
-  // ------- state -------
+  // State
   const [selectedReason, setSelectedReason] = useState<string | null>(null);
   const [maxPrice, setMaxPrice] = useState<string>("");
   const [feedbackText, setFeedbackText] = useState<string>("");
@@ -52,7 +52,7 @@ function CancellationReasonModal({
 
   if (!visible) return null;
 
-  // ------- handlers -------
+  // Handlers
   const handleContinue = () => {
     if (!isFormValid || !onSubmit) return;
 
@@ -75,7 +75,7 @@ function CancellationReasonModal({
 
   const handleAcceptOffer = () => onAcceptOffer?.();
 
-  // ------- Stepper -------
+  // Stepper
   const Stepper = () => (
     <div className="flex items-center justify-start gap-3">
       <div className="flex items-center gap-2">
@@ -108,7 +108,7 @@ function CancellationReasonModal({
     </div>
   );
 
-  // ------- Radio -------
+  // Radio option
   const RadioOption = ({ value, label }: { value: string; label: string }) => (
     <label className="flex items-center gap-3 cursor-pointer group">
       <div className="relative">
@@ -142,7 +142,7 @@ function CancellationReasonModal({
     </label>
   );
 
-  // ------- Shared dynamic blocks (used by both desktop & mobile) -------
+  // Shared dynamic blocks (used by both desktop & mobile)
   const DynamicBlocks = () => {
     if (selectedReason === "platform-not-helpful") {
       return (
@@ -348,7 +348,7 @@ function CancellationReasonModal({
     );
   };
 
-  // ------- Desktop content -------
+  // Desktop content
   const ContentDesktop = () => (
     <>
       <h2
@@ -365,7 +365,7 @@ function CancellationReasonModal({
         Please take a minute to let us know why:
       </p>
 
-      {/* initial validation message on desktop only shows when none picked */}
+  {/* initial validation message shown on desktop when none picked */}
       {!selectedReason && (
         <p
           className="mt-6 text-[15px] text-red-500"
@@ -407,7 +407,7 @@ function CancellationReasonModal({
     </>
   );
 
-  // ------- Mobile content (matches Figma) -------
+  // Mobile content
   const ContentMobile = () => (
     <>
       <h2
@@ -424,10 +424,10 @@ function CancellationReasonModal({
         Please take a minute to let us know why:
       </p>
 
-      {/* thin divider */}
+  {/* thin divider */}
       <div className="mt-3 mb-3 h-px bg-gray-200" />
 
-      {/* red validation note right under divider until a reason is chosen */}
+  {/* red validation note until a reason is chosen */}
       {!selectedReason && (
         <p
           className="text-[15px] text-red-500"
@@ -444,7 +444,7 @@ function CancellationReasonModal({
 
   return (
     <>
-      {/* ===== Desktop (>=1024px) ===== */}
+  {/* Desktop (>=1024px) */}
       {isDesktop && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/30"
@@ -545,7 +545,7 @@ function CancellationReasonModal({
         </div>
       )}
 
-      {/* ===== Mobile (<1024px) ===== */}
+  {/* Mobile (<1024px) */}
       {!isDesktop && (
         <MUIDrawer
           open={visible}

@@ -34,7 +34,7 @@ export default function CancellationModal({
 
   return (
     <>
-      {/* ===== Desktop dialog (renders ONLY on >=1024px) ===== */}
+  {/* Desktop dialog */}
       {isDesktop && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center "
@@ -56,7 +56,7 @@ export default function CancellationModal({
             maxWidth="lg"
             fullWidth
             paperSx={{ borderRadius: 6 }}
-            desktopOnly // <-- prevents portal on mobile if someone reuses this
+            desktopOnly // prevents portal on mobile
             title={
               <div
                 style={{
@@ -155,7 +155,7 @@ export default function CancellationModal({
         </div>
       )}
 
-      {/* ===== Mobile bottom sheet (renders ONLY on <1024px) ===== */}
+  {/* Mobile bottom sheet */}
       {!isDesktop && (
         <MUIDrawer
           open={visible}
@@ -164,7 +164,7 @@ export default function CancellationModal({
           showGrabHandle
           maxHeight="min(75dvh,75vh)"
         >
-          {/* Image Card (top) */}
+          {/* Image card */}
           <div className="w-full rounded-3xl overflow-hidden shadow-[0_6px_18px_rgba(0,0,0,0.08)] border border-gray-200 mt-3">
             <div className="relative w-full aspect-[16/9]">
               <Image

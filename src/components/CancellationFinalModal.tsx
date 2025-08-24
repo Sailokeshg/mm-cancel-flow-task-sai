@@ -18,7 +18,7 @@ function CancellationFinalModal({ visible, onClose, totalSteps = 3 }: Props) {
 
   if (!visible) return null;
 
-  // ------- Stepper (all steps complete) -------
+  // Stepper (all steps complete)
   const Stepper = () => (
     <div className="flex items-center justify-start gap-3">
       <div className="flex items-center gap-2">
@@ -35,7 +35,7 @@ function CancellationFinalModal({ visible, onClose, totalSteps = 3 }: Props) {
     </div>
   );
 
-  // ------- Desktop content -------
+  // Desktop content
   const ContentDesktop = () => (
     <>
       <h1
@@ -81,7 +81,7 @@ function CancellationFinalModal({ visible, onClose, totalSteps = 3 }: Props) {
     </>
   );
 
-  // ------- Mobile content (matches Figma) -------
+  // Mobile content
   const ContentMobile = () => (
     <>
       {/* Image card */}
@@ -134,7 +134,7 @@ function CancellationFinalModal({ visible, onClose, totalSteps = 3 }: Props) {
 
   return (
     <>
-      {/* ===== Desktop dialog (>=1024px) ===== */}
+  {/* Desktop dialog */}
       {isDesktop && (
         <div
           className="fixed inset-0 z-[10] flex items-center justify-center bg-black/50"
@@ -237,7 +237,7 @@ function CancellationFinalModal({ visible, onClose, totalSteps = 3 }: Props) {
         </div>
       )}
 
-      {/* ===== Mobile drawer (<1024px) ===== */}
+  {/* Mobile drawer */}
       {!isDesktop && (
         <MUIDrawer
           open={visible}
