@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import useMediaQuery from "@mui/material/useMediaQuery";
+import { DESKTOP_MIN_WIDTH_PX, FONT_DM_SANS_VAR } from "../lib/ui/constants";
 import ResponsiveDialog from "./ResponsiveDialog";
 import MUIDrawer from "./MUIDrawer";
 import CancellationSurveyModal from "./CancellationSurveyModal";
@@ -11,13 +12,13 @@ type Props = {
   visible: boolean;
   onClose: () => void;
   onBack?: () => void;
-  onAccept: () => void; 
-  onDecline: () => void; 
-  step?: number; 
-  totalSteps?: number; 
+  onAccept: () => void;
+  onDecline: () => void;
+  step?: number;
+  totalSteps?: number;
 };
 
-export default function JobSearchModal({
+function JobSearchModal({
   visible,
   onClose,
   onBack,
@@ -29,7 +30,7 @@ export default function JobSearchModal({
   const [showSurveyModal, setShowSurveyModal] = useState(false);
   const [hideForOfferModal, setHideForOfferModal] = useState(false);
 
-  const isDesktop = useMediaQuery("(min-width:1024px)");
+  const isDesktop = useMediaQuery(`(min-width:${DESKTOP_MIN_WIDTH_PX}px)`);
 
   const handleDecline = () => setShowSurveyModal(true);
   const handleSurveySubmit = (feedback: {
@@ -105,7 +106,7 @@ export default function JobSearchModal({
       </div>
       <span
         className="text-sm text-gray-600"
-        style={{ fontFamily: "var(--font-dm-sans)" }}
+        style={{ fontFamily: FONT_DM_SANS_VAR }}
       >
         Step {step} of {totalSteps}
       </span>
@@ -116,7 +117,7 @@ export default function JobSearchModal({
     <div className="rounded-[20px] border border-[#C9B7FF] bg-[#EFE4FF]/70 p-4 md:p-5 shadow-sm">
       <h3
         className="text-[26px] md:text-[28px] font-semibold text-gray-900 leading-[1.15]"
-        style={{ fontFamily: "var(--font-dm-sans)" }}
+        style={{ fontFamily: FONT_DM_SANS_VAR }}
       >
         Here’s <u>50% off</u> until you find a job.
       </h3>
@@ -124,7 +125,7 @@ export default function JobSearchModal({
       <div className=" flex items-center justify-center gap-5">
         <div
           className="text-[26px] md:text-[28px] font-extrabold text-[#5D3AF7]"
-          style={{ fontFamily: "var(--font-dm-sans)" }}
+          style={{ fontFamily: FONT_DM_SANS_VAR }}
         >
           $12.50<span className="font-semibold">/month</span>
         </div>
@@ -136,14 +137,14 @@ export default function JobSearchModal({
       <button
         onClick={onAccept}
         className="mt-5 w-full h-[56px] rounded-2xl font-semibold text-white bg-[#28B463] hover:bg-[#24A259] transition-colors"
-        style={{ fontFamily: "var(--font-dm-sans)" }}
+        style={{ fontFamily: FONT_DM_SANS_VAR }}
       >
         Get 50% off
       </button>
 
       <p
         className=" text-[15px] italic text-gray-600 text-center"
-        style={{ fontFamily: "var(--font-dm-sans)" }}
+        style={{ fontFamily: FONT_DM_SANS_VAR }}
       >
         You won’t be charged until your next billing date.
       </p>
@@ -154,14 +155,14 @@ export default function JobSearchModal({
     <div className="max-w-[760px]">
       <h1
         className="text-[44px] font-semibold text-gray-800 leading-[1.1] "
-        style={{ fontFamily: "var(--font-dm-sans)" }}
+        style={{ fontFamily: FONT_DM_SANS_VAR }}
       >
         We built this to help you land the job, this makes it a little easier.
       </h1>
 
       <p
         className="mt-3 text-[20px] text-gray-600"
-        style={{ fontFamily: "var(--font-dm-sans)" }}
+        style={{ fontFamily: FONT_DM_SANS_VAR }}
       >
         We&apos;ve been there and we&apos;re here to help you.
       </p>
@@ -174,7 +175,7 @@ export default function JobSearchModal({
       <button
         onClick={handleDecline}
         className="hidden md:block mt-6 w-full h-[56px] rounded-2xl border border-gray-300 bg-white text-gray-800 font-semibold hover:bg-gray-50 transition-colors"
-        style={{ fontFamily: "var(--font-dm-sans)" }}
+        style={{ fontFamily: FONT_DM_SANS_VAR }}
       >
         No thanks
       </button>
@@ -224,7 +225,7 @@ export default function JobSearchModal({
                   </svg>
                   <span
                     className="text-sm"
-                    style={{ fontFamily: "var(--font-dm-sans)" }}
+                    style={{ fontFamily: FONT_DM_SANS_VAR }}
                   >
                     Back
                   </span>
@@ -235,7 +236,7 @@ export default function JobSearchModal({
                   <h3
                     id="offer-title"
                     className="text-lg font-semibold text-gray-900"
-                    style={{ fontFamily: "var(--font-dm-sans)" }}
+                    style={{ fontFamily: FONT_DM_SANS_VAR }}
                   >
                     Subscription Cancellation
                   </h3>
@@ -301,7 +302,7 @@ export default function JobSearchModal({
             <button
               onClick={handleDecline}
               className="w-full h-[56px] rounded-2xl border border-gray-300 bg-white text-gray-800 font-semibold hover:bg-gray-50 transition-colors"
-              style={{ fontFamily: "var(--font-dm-sans)" }}
+              style={{ fontFamily: FONT_DM_SANS_VAR }}
             >
               No thanks
             </button>
@@ -311,7 +312,7 @@ export default function JobSearchModal({
           {/* Headline */}
           <h1
             className="text-[32px] font-semibold text-gray-800 leading-[1.15]"
-            style={{ fontFamily: "var(--font-dm-sans)" }}
+            style={{ fontFamily: FONT_DM_SANS_VAR }}
           >
             We built this to help you land the job, this makes it a little
             easier.
@@ -320,7 +321,7 @@ export default function JobSearchModal({
           {/* Subcopy */}
           <p
             className="mt-3 text-[17px] text-gray-600"
-            style={{ fontFamily: "var(--font-dm-sans)" }}
+            style={{ fontFamily: FONT_DM_SANS_VAR }}
           >
             We&apos;ve been there and we&apos;re here to help you.
           </p>
@@ -348,3 +349,5 @@ export default function JobSearchModal({
     </>
   );
 }
+
+export default React.memo(JobSearchModal);

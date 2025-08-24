@@ -2,6 +2,7 @@
 
 import React from "react";
 import Image from "next/image";
+import { DESKTOP_MIN_WIDTH_PX, FONT_DM_SANS_VAR } from "../lib/ui/constants";
 import ResponsiveDialog from "./ResponsiveDialog";
 import MUIDrawer from "./MUIDrawer";
 import useMediaQuery from "@mui/material/useMediaQuery";
@@ -15,7 +16,7 @@ type Props = {
   imageUrl?: string;
 };
 
-export default function CancellationProcessedModal({
+function CancellationProcessedModal({
   visible,
   onClose,
   totalSteps = 3,
@@ -23,7 +24,7 @@ export default function CancellationProcessedModal({
   body = "We’re stoked to hear you’ve landed a job and sorted your visa. Big congrats from the team. 🙌",
   imageUrl = "/empire-state-compressed.jpg",
 }: Props) {
-  const isDesktop = useMediaQuery("(min-width:1024px)");
+  const isDesktop = useMediaQuery(`(min-width:${DESKTOP_MIN_WIDTH_PX}px)`);
 
   if (!visible) return null;
 
@@ -31,12 +32,15 @@ export default function CancellationProcessedModal({
     <div className="flex items-center gap-3">
       <div className="flex items-center gap-2">
         {Array.from({ length: totalSteps }).map((_, i) => (
-          <span key={i} className="h-2 w-5 rounded-full bg-green-500 transition-colors" />
+          <span
+            key={i}
+            className="h-2 w-5 rounded-full bg-green-500 transition-colors"
+          />
         ))}
       </div>
       <span
         className="text-sm text-gray-600"
-        style={{ fontFamily: "var(--font-dm-sans)" }}
+        style={{ fontFamily: FONT_DM_SANS_VAR }}
       >
         Completed
       </span>
@@ -47,14 +51,14 @@ export default function CancellationProcessedModal({
     <div className="max-w-[760px]">
       <h1
         className="text-4xl md:text-4xl font-semibold text-gray-800 leading-tight"
-        style={{ fontFamily: "var(--font-dm-sans)" }}
+        style={{ fontFamily: FONT_DM_SANS_VAR }}
       >
         {headline}
       </h1>
 
       <p
         className="mt-4 text-[18px] text-gray-700 leading-relaxed max-w-[620px]"
-        style={{ fontFamily: "var(--font-dm-sans)" }}
+        style={{ fontFamily: FONT_DM_SANS_VAR }}
       >
         {body}
       </p>
@@ -63,7 +67,7 @@ export default function CancellationProcessedModal({
       <button
         onClick={onClose}
         className="hidden md:block w-full max-w-[560px] py-4 rounded-2xl font-semibold bg-[#8B5CF6] text-white hover:bg-[#7C3AED] transition-colors"
-        style={{ fontFamily: "var(--font-dm-sans)" }}
+        style={{ fontFamily: FONT_DM_SANS_VAR }}
       >
         Finish
       </button>
@@ -97,7 +101,7 @@ export default function CancellationProcessedModal({
                   <h3
                     id="processed-title"
                     className="text-base md:text-lg font-semibold text-gray-900"
-                    style={{ fontFamily: "var(--font-dm-sans)" }}
+                    style={{ fontFamily: FONT_DM_SANS_VAR }}
                   >
                     Subscription Cancelled
                   </h3>
@@ -115,7 +119,12 @@ export default function CancellationProcessedModal({
                     stroke="currentColor"
                     viewBox="0 0 24 24"
                   >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M6 18L18 6M6 6l12 12"
+                    />
                   </svg>
                 </button>
               </div>
@@ -156,7 +165,7 @@ export default function CancellationProcessedModal({
             <button
               onClick={onClose}
               className="w-full h-[56px] rounded-2xl font-semibold bg-[#8B5CF6] text-white hover:bg-[#7C3AED] transition-colors"
-              style={{ fontFamily: "var(--font-dm-sans)" }}
+              style={{ fontFamily: FONT_DM_SANS_VAR }}
             >
               Finish
             </button>
@@ -178,14 +187,14 @@ export default function CancellationProcessedModal({
 
           <h1
             className="mt-5 text-[28px] font-semibold text-gray-800 leading-[1.2]"
-            style={{ fontFamily: "var(--font-dm-sans)" }}
+            style={{ fontFamily: FONT_DM_SANS_VAR }}
           >
             {headline}
           </h1>
 
           <p
             className="mt-3 text-[16px] text-gray-700 leading-relaxed"
-            style={{ fontFamily: "var(--font-dm-sans)" }}
+            style={{ fontFamily: FONT_DM_SANS_VAR }}
           >
             {body}
           </p>
@@ -194,3 +203,5 @@ export default function CancellationProcessedModal({
     </>
   );
 }
+
+export default React.memo(CancellationProcessedModal);

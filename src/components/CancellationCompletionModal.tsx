@@ -5,6 +5,7 @@ import Image from "next/image";
 import ResponsiveDialog from "./ResponsiveDialog";
 import MUIDrawer from "./MUIDrawer";
 import useMediaQuery from "@mui/material/useMediaQuery";
+import { DESKTOP_MIN_WIDTH_PX, FONT_DM_SANS_VAR } from "../lib/ui/constants";
 
 type Props = {
   visible: boolean;
@@ -19,7 +20,7 @@ type Props = {
   messageFooter?: string; // supports _underline_ segments
 };
 
-export default function CancellationCompletionModal({
+function CancellationCompletionModal({
   visible,
   onClose,
   totalSteps = 3,
@@ -31,8 +32,8 @@ export default function CancellationCompletionModal({
   messageBody = "We’ve got your back, whether it’s questions, paperwork, or just figuring out your options.",
   messageFooter = "Keep an eye on your inbox, I’ll be in touch _shortly_.",
 }: Props) {
-  // Render desktop dialog ONLY at >= 1024px
-  const isDesktop = useMediaQuery("(min-width:1024px)");
+  // Render desktop dialog ONLY at >= DESKTOP_MIN_WIDTH_PX
+  const isDesktop = useMediaQuery(`(min-width:${DESKTOP_MIN_WIDTH_PX}px)`);
 
   if (!visible) return null;
 
@@ -52,10 +53,16 @@ export default function CancellationCompletionModal({
     <div className="flex items-center gap-3">
       <div className="flex items-center gap-2">
         {Array.from({ length: totalSteps }).map((_, i) => (
-          <span key={i} className="h-2 w-5 rounded-full bg-green-500 transition-colors" />
+          <span
+            key={i}
+            className="h-2 w-5 rounded-full bg-green-500 transition-colors"
+          />
         ))}
       </div>
-      <span className="text-sm text-gray-600" style={{ fontFamily: "var(--font-dm-sans)" }}>
+      <span
+        className="text-sm text-gray-600"
+        style={{ fontFamily: FONT_DM_SANS_VAR }}
+      >
         Completed
       </span>
     </div>
@@ -65,7 +72,7 @@ export default function CancellationCompletionModal({
     <div className="max-w-[760px]">
       <h1
         className="text-4xl md:text-4xl font-semibold text-gray-800 leading-tight"
-        style={{ fontFamily: "var(--font-dm-sans)" }}
+        style={{ fontFamily: FONT_DM_SANS_VAR }}
       >
         {headline}
       </h1>
@@ -74,12 +81,17 @@ export default function CancellationCompletionModal({
         <div className="flex items-center gap-4">
           {repAvatarUrl ? (
             <div className="relative h-14 w-14 rounded-full overflow-hidden">
-              <Image src={repAvatarUrl} alt={repName} fill className="object-cover" />
+              <Image
+                src={repAvatarUrl}
+                alt={repName}
+                fill
+                className="object-cover"
+              />
             </div>
           ) : (
             <div
               className="h-14 w-14 rounded-full bg-gray-200 flex items-center justify-center text-gray-600 font-medium text-lg"
-              style={{ fontFamily: "var(--font-dm-sans)" }}
+              style={{ fontFamily: FONT_DM_SANS_VAR }}
             >
               {repName
                 .split(" ")
@@ -89,19 +101,30 @@ export default function CancellationCompletionModal({
             </div>
           )}
           <div className="flex flex-col">
-            <span className="text-sm font-medium text-gray-800" style={{ fontFamily: "var(--font-dm-sans)" }}>
+            <span
+              className="text-sm font-medium text-gray-800"
+              style={{ fontFamily: FONT_DM_SANS_VAR }}
+            >
               {repName}
             </span>
-            <span className="text-xs text-gray-500" style={{ fontFamily: "var(--font-dm-sans)" }}>
+            <span
+              className="text-xs text-gray-500"
+              style={{ fontFamily: FONT_DM_SANS_VAR }}
+            >
               {repEmail}
             </span>
           </div>
         </div>
 
-        <div className="mt-6 ml-[72px] space-y-4 text-[15px] leading-relaxed" style={{ fontFamily: "var(--font-dm-sans)" }}>
+        <div
+          className="mt-6 ml-[72px] space-y-4 text-[15px] leading-relaxed"
+          style={{ fontFamily: FONT_DM_SANS_VAR }}
+        >
           <p className="text-gray-800 font-medium">{messageLead}</p>
           <p className="text-gray-600">{messageBody}</p>
-          <p className="text-gray-600">{underlineFromUnderscores(messageFooter)}</p>
+          <p className="text-gray-600">
+            {underlineFromUnderscores(messageFooter)}
+          </p>
         </div>
       </div>
 
@@ -109,7 +132,7 @@ export default function CancellationCompletionModal({
       <button
         onClick={onClose}
         className="hidden md:block w-full max-w-[560px] py-4 rounded-2xl font-semibold bg-[#5D3AF7] text-white hover:bg-[#4F2FF3] transition-colors"
-        style={{ fontFamily: "var(--font-dm-sans)" }}
+        style={{ fontFamily: FONT_DM_SANS_VAR }}
       >
         Finish
       </button>
@@ -142,7 +165,7 @@ export default function CancellationCompletionModal({
                   <h3
                     id="completion-title"
                     className="text-base md:text-lg font-semibold text-gray-900"
-                    style={{ fontFamily: "var(--font-dm-sans)" }}
+                    style={{ fontFamily: FONT_DM_SANS_VAR }}
                   >
                     Subscription Cancelled
                   </h3>
@@ -154,8 +177,18 @@ export default function CancellationCompletionModal({
                   className="absolute right-5 top-4 p-1.5 text-gray-400 hover:text-gray-600"
                   aria-label="Close"
                 >
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  <svg
+                    className="w-6 h-6"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M6 18L18 6M6 6l12 12"
+                    />
                   </svg>
                 </button>
               </div>
@@ -211,7 +244,12 @@ export default function CancellationCompletionModal({
             <div className="flex items-center gap-3">
               {repAvatarUrl ? (
                 <div className="relative h-12 w-12 rounded-full overflow-hidden">
-                  <Image src={repAvatarUrl} alt={repName} fill className="object-cover" />
+                  <Image
+                    src={repAvatarUrl}
+                    alt={repName}
+                    fill
+                    className="object-cover"
+                  />
                 </div>
               ) : (
                 <div
@@ -226,19 +264,30 @@ export default function CancellationCompletionModal({
                 </div>
               )}
               <div className="flex flex-col">
-                <span className="text-sm font-medium text-gray-800" style={{ fontFamily: "var(--font-dm-sans)" }}>
+                <span
+                  className="text-sm font-medium text-gray-800"
+                  style={{ fontFamily: "var(--font-dm-sans)" }}
+                >
                   {repName}
                 </span>
-                <span className="text-xs text-gray-500" style={{ fontFamily: "var(--font-dm-sans)" }}>
+                <span
+                  className="text-xs text-gray-500"
+                  style={{ fontFamily: "var(--font-dm-sans)" }}
+                >
                   {repEmail}
                 </span>
               </div>
             </div>
 
-            <div className="mt-4 space-y-3 text-[15px] leading-relaxed" style={{ fontFamily: "var(--font-dm-sans)" }}>
+            <div
+              className="mt-4 space-y-3 text-[15px] leading-relaxed"
+              style={{ fontFamily: FONT_DM_SANS_VAR }}
+            >
               <p className="text-gray-800 font-medium">{messageLead}</p>
               <p className="text-gray-600">{messageBody}</p>
-              <p className="text-gray-600">{underlineFromUnderscores(messageFooter)}</p>
+              <p className="text-gray-600">
+                {underlineFromUnderscores(messageFooter)}
+              </p>
             </div>
           </div>
         </MUIDrawer>
@@ -246,3 +295,5 @@ export default function CancellationCompletionModal({
     </>
   );
 }
+
+export default React.memo(CancellationCompletionModal);

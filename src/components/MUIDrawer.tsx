@@ -7,6 +7,7 @@ import Typography from "@mui/material/Typography";
 import IconButton from "@mui/material/IconButton";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { styled } from "@mui/material/styles";
+import { DESKTOP_MIN_WIDTH_PX, FONT_DM_SANS_VAR } from "../lib/ui/constants";
 import CloseIcon from "@mui/icons-material/Close";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 
@@ -23,7 +24,8 @@ interface MUIDrawerProps {
   maxHeight?: string;
 }
 
-const useIsMobile = () => useMediaQuery("(max-width: 1023.98px)");
+const useIsMobile = () =>
+  useMediaQuery(`(max-width: ${DESKTOP_MIN_WIDTH_PX - 0.02}px)`);
 
 const GrabHandle = styled("div")(() => ({
   width: 44,
@@ -58,7 +60,7 @@ const Footer = styled(Box)(() => ({
   paddingBottom: "calc(env(safe-area-inset-bottom) + 16px)",
 }));
 
-export default function MUIDrawer({
+function MUIDrawer({
   open,
   onClose,
   onOpen = () => {},
@@ -128,7 +130,7 @@ export default function MUIDrawer({
             variant="h6"
             component="h3"
             sx={{
-              fontFamily: "var(--font-dm-sans)",
+              fontFamily: FONT_DM_SANS_VAR,
               fontWeight: 700,
               fontSize: "20px",
               letterSpacing: "-0.01em",
@@ -179,7 +181,7 @@ export default function MUIDrawer({
                 color: "#374151",
                 cursor: "pointer",
                 padding: 0,
-                fontFamily: "var(--font-dm-sans)",
+                fontFamily: FONT_DM_SANS_VAR,
                 fontSize: "14px",
                 "&:hover": { color: "#111827" },
               }}
@@ -198,3 +200,5 @@ export default function MUIDrawer({
     </SwipeableDrawer>
   );
 }
+
+export default React.memo(MUIDrawer);

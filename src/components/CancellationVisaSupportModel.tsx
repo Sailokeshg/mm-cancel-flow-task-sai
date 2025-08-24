@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import useMediaQuery from "@mui/material/useMediaQuery";
+import { DESKTOP_MIN_WIDTH_PX, FONT_DM_SANS_VAR } from "../lib/ui/constants";
 import ResponsiveDialog from "./ResponsiveDialog";
 import MUIDrawer from "./MUIDrawer";
 
@@ -15,7 +16,7 @@ type Props = {
   foundViaYes?: boolean; // whether user found job via MigrateMate
 };
 
-export default function CancellationVisaSupportModal({
+function CancellationVisaSupportModal({
   visible,
   onClose,
   onBack,
@@ -23,7 +24,7 @@ export default function CancellationVisaSupportModal({
   totalSteps = 3,
   foundViaYes = true,
 }: Props) {
-  const isDesktop = useMediaQuery("(min-width:1024px)");
+  const isDesktop = useMediaQuery(`(min-width:${DESKTOP_MIN_WIDTH_PX}px)`);
 
   // ---- This screen is Step 3 of 3 ----
   const STEP_INDEX = 3;
@@ -62,7 +63,7 @@ export default function CancellationVisaSupportModal({
       </div>
       <span
         className="text-sm text-gray-600"
-        style={{ fontFamily: "var(--font-dm-sans)" }}
+        style={{ fontFamily: FONT_DM_SANS_VAR }}
       >
         Step {STEP_INDEX} of {totalSteps}
       </span>
@@ -74,7 +75,7 @@ export default function CancellationVisaSupportModal({
     <div className="max-w-[760px]">
       <h1
         className="text-4xl md:text-4xl font-semibold text-gray-800 leading-tight"
-        style={{ fontFamily: "var(--font-dm-sans)" }}
+        style={{ fontFamily: FONT_DM_SANS_VAR }}
       >
         {foundViaYes
           ? "We helped you land the job, now let’s help you secure your visa."
@@ -86,7 +87,7 @@ export default function CancellationVisaSupportModal({
 
       <p
         className="text-gray-700 text-base md:text-[17px] leading-relaxed"
-        style={{ fontFamily: "var(--font-dm-sans)" }}
+        style={{ fontFamily: FONT_DM_SANS_VAR }}
       >
         Is your company providing an immigration lawyer to help with your visa?*
       </p>
@@ -98,7 +99,7 @@ export default function CancellationVisaSupportModal({
           {answer !== false && (
             <label
               className="flex items-center gap-3 cursor-pointer"
-              style={{ fontFamily: "var(--font-dm-sans)" }}
+              style={{ fontFamily: FONT_DM_SANS_VAR }}
             >
               <input
                 type="radio"
@@ -114,7 +115,7 @@ export default function CancellationVisaSupportModal({
           {answer !== true && (
             <label
               className="flex items-center gap-3 cursor-pointer"
-              style={{ fontFamily: "var(--font-dm-sans)" }}
+              style={{ fontFamily: FONT_DM_SANS_VAR }}
             >
               <input
                 type="radio"
@@ -134,14 +135,14 @@ export default function CancellationVisaSupportModal({
         <div className="mt-6">
           <p
             className="text-gray-600 text-base md:text-[17px] leading-relaxed mb-4"
-            style={{ fontFamily: "var(--font-dm-sans)" }}
+            style={{ fontFamily: FONT_DM_SANS_VAR }}
           >
             We can connect you with one of our trusted partners.
           </p>
           <label
             htmlFor="visa-type-no"
             className="block text-[16px] text-gray-800 mb-2"
-            style={{ fontFamily: "var(--font-dm-sans)" }}
+            style={{ fontFamily: FONT_DM_SANS_VAR }}
           >
             Which visa would you like to apply for?*
           </label>
@@ -151,7 +152,7 @@ export default function CancellationVisaSupportModal({
             value={visaType}
             onChange={(e) => setVisaType(e.target.value)}
             className="w-full max-w-[560px] px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#5D3AF7] focus:border-transparent"
-            style={{ fontFamily: "var(--font-dm-sans)" }}
+            style={{ fontFamily: FONT_DM_SANS_VAR }}
           />
         </div>
       )}
@@ -162,7 +163,7 @@ export default function CancellationVisaSupportModal({
           <label
             htmlFor="visa-type-yes"
             className="block text-[16px] text-gray-800 mb-2"
-            style={{ fontFamily: "var(--font-dm-sans)" }}
+            style={{ fontFamily: FONT_DM_SANS_VAR }}
           >
             What visa will you be applying for?*
           </label>
@@ -174,19 +175,22 @@ export default function CancellationVisaSupportModal({
             onChange={(e) => {
               const val = e.target.value;
               if (val.length === 0 || val.length >= 2) {
-          setVisaType(val);
+                setVisaType(val);
               } else {
-          setVisaType(val);
+                setVisaType(val);
               }
             }}
             className="w-full max-w-[560px] px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#5D3AF7] focus:border-transparent"
-            style={{ fontFamily: "var(--font-dm-sans)" }}
+            style={{ fontFamily: FONT_DM_SANS_VAR }}
             required
             pattern=".{2,}"
             title="Please enter at least 2 characters"
           />
           {visaType.length > 0 && visaType.length < 2 && (
-            <p className="text-red-500 text-sm mt-1" style={{ fontFamily: "var(--font-dm-sans)" }}>
+            <p
+              className="text-red-500 text-sm mt-1"
+              style={{ fontFamily: FONT_DM_SANS_VAR }}
+            >
               Please enter at least 2 characters.
             </p>
           )}
@@ -204,7 +208,7 @@ export default function CancellationVisaSupportModal({
             ? "bg-[#5D3AF7] text-white hover:bg-[#4F2FF3]"
             : "bg-gray-100 text-gray-400 cursor-not-allowed",
         ].join(" ")}
-        style={{ fontFamily: "var(--font-dm-sans)" }}
+        style={{ fontFamily: FONT_DM_SANS_VAR }}
       >
         Complete cancellation
       </button>
@@ -254,7 +258,7 @@ export default function CancellationVisaSupportModal({
                   </svg>
                   <span
                     className="text-sm"
-                    style={{ fontFamily: "var(--font-dm-sans)" }}
+                    style={{ fontFamily: FONT_DM_SANS_VAR }}
                   >
                     Back
                   </span>
@@ -264,7 +268,7 @@ export default function CancellationVisaSupportModal({
                   <h3
                     id="visa-title"
                     className="text-base md:text-lg font-semibold text-gray-900"
-                    style={{ fontFamily: "var(--font-dm-sans)" }}
+                    style={{ fontFamily: FONT_DM_SANS_VAR }}
                   >
                     Subscription Cancellation
                   </h3>
@@ -338,7 +342,7 @@ export default function CancellationVisaSupportModal({
                   ? "bg-[#5D3AF7] text-white hover:bg-[#4F2FF3]"
                   : "bg-gray-100 text-gray-400 cursor-not-allowed",
               ].join(" ")}
-              style={{ fontFamily: "var(--font-dm-sans)" }}
+              style={{ fontFamily: FONT_DM_SANS_VAR }}
             >
               Complete cancellation
             </button>
@@ -347,7 +351,7 @@ export default function CancellationVisaSupportModal({
           {/* Heading now matches desktop logic */}
           <h1
             className="text-[28px] font-semibold text-gray-800 leading-tight"
-            style={{ fontFamily: "var(--font-dm-sans)" }}
+            style={{ fontFamily: FONT_DM_SANS_VAR }}
           >
             {foundViaYes
               ? "We helped you land the job, now let’s help you secure your visa."
@@ -359,7 +363,7 @@ export default function CancellationVisaSupportModal({
 
           <p
             className="text-[16px] text-gray-700"
-            style={{ fontFamily: "var(--font-dm-sans)" }}
+            style={{ fontFamily: FONT_DM_SANS_VAR }}
           >
             Is your company providing an immigration lawyer to help with your
             visa?*
@@ -373,7 +377,7 @@ export default function CancellationVisaSupportModal({
               {answer !== false && (
                 <label
                   className="flex items-center gap-3 cursor-pointer"
-                  style={{ fontFamily: "var(--font-dm-sans)" }}
+                  style={{ fontFamily: FONT_DM_SANS_VAR }}
                 >
                   <input
                     type="radio"
@@ -389,7 +393,7 @@ export default function CancellationVisaSupportModal({
               {answer !== true && (
                 <label
                   className="flex items-center gap-3 cursor-pointer"
-                  style={{ fontFamily: "var(--font-dm-sans)" }}
+                  style={{ fontFamily: FONT_DM_SANS_VAR }}
                 >
                   <input
                     type="radio"
@@ -409,14 +413,14 @@ export default function CancellationVisaSupportModal({
             <div className="mt-4">
               <p
                 className="text-[16px] text-gray-700 mb-4"
-                style={{ fontFamily: "var(--font-dm-sans)" }}
+                style={{ fontFamily: FONT_DM_SANS_VAR }}
               >
                 We can connect you with one of our trusted partners.
               </p>
               <label
                 htmlFor="visa-type-mobile-no"
                 className="block text-[16px] text-gray-800 mb-2"
-                style={{ fontFamily: "var(--font-dm-sans)" }}
+                style={{ fontFamily: FONT_DM_SANS_VAR }}
               >
                 Which visa would you like to apply for?*
               </label>
@@ -426,7 +430,7 @@ export default function CancellationVisaSupportModal({
                 value={visaType}
                 onChange={(e) => setVisaType(e.target.value)}
                 className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#5D3AF7] focus:border-transparent"
-                style={{ fontFamily: "var(--font-dm-sans)" }}
+                style={{ fontFamily: FONT_DM_SANS_VAR }}
               />
             </div>
           )}
@@ -436,7 +440,7 @@ export default function CancellationVisaSupportModal({
               <label
                 htmlFor="visa-type-mobile"
                 className="block text-[16px] text-gray-800 mb-2"
-                style={{ fontFamily: "var(--font-dm-sans)" }}
+                style={{ fontFamily: FONT_DM_SANS_VAR }}
               >
                 What visa will you be applying for?*
               </label>
@@ -446,7 +450,7 @@ export default function CancellationVisaSupportModal({
                 value={visaType}
                 onChange={(e) => setVisaType(e.target.value)}
                 className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#5D3AF7] focus:border-transparent"
-                style={{ fontFamily: "var(--font-dm-sans)" }}
+                style={{ fontFamily: FONT_DM_SANS_VAR }}
               />
             </div>
           )}
@@ -455,3 +459,5 @@ export default function CancellationVisaSupportModal({
     </>
   );
 }
+
+export default React.memo(CancellationVisaSupportModal);

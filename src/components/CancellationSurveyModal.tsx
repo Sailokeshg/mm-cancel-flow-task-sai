@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import useMediaQuery from "@mui/material/useMediaQuery";
+import { DESKTOP_MIN_WIDTH_PX, FONT_DM_SANS_VAR } from "../lib/ui/constants";
 import OptionButton from "./OptionButton";
 import ResponsiveDialog from "./ResponsiveDialog";
 import MUIDrawer from "./MUIDrawer";
@@ -27,7 +28,7 @@ type Props = {
   totalSteps?: number;
 };
 
-export default function CancellationSurveyModal({
+function CancellationSurveyModal({
   visible,
   onClose,
   onBack,
@@ -48,7 +49,7 @@ export default function CancellationSurveyModal({
   const [showFinalModal, setShowFinalModal] = useState(false);
   const [submittedReason, setSubmittedReason] = useState<string | null>(null);
 
-  const isDesktop = useMediaQuery("(min-width:1024px)");
+  const isDesktop = useMediaQuery(`(min-width:${DESKTOP_MIN_WIDTH_PX}px)`);
 
   const isFormValid = Boolean(appliedCount && emailedCount && interviewedCount);
 
@@ -158,7 +159,7 @@ export default function CancellationSurveyModal({
       </div>
       <span
         className="text-sm text-gray-600"
-        style={{ fontFamily: "var(--font-dm-sans)" }}
+        style={{ fontFamily: FONT_DM_SANS_VAR }}
       >
         Step {step} of {totalSteps}
       </span>
@@ -170,7 +171,7 @@ export default function CancellationSurveyModal({
     <>
       <h2
         className="text-[28px] md:text-[34px] font-semibold text-gray-800 leading-snug"
-        style={{ fontFamily: "var(--font-dm-sans)" }}
+        style={{ fontFamily: FONT_DM_SANS_VAR }}
       >
         Help us understand how you were using Migrate Mate.
       </h2>
@@ -182,7 +183,7 @@ export default function CancellationSurveyModal({
         <button
           onClick={handleAcceptOffer}
           className="w-full py-3.5 rounded-2xl font-semibold text-white bg-[#28B463] hover:bg-[#24A259] transition-colors flex items-center justify-center gap-2"
-          style={{ fontFamily: "var(--font-dm-sans)" }}
+          style={{ fontFamily: FONT_DM_SANS_VAR }}
         >
           <span>Get 50% off</span>
           <span className="text-lg">|</span>
@@ -200,7 +201,7 @@ export default function CancellationSurveyModal({
               ? "bg-red-500 text-white hover:bg-red-600"
               : "bg-gray-100 text-gray-400 border border-gray-200 cursor-not-allowed",
           ].join(" ")}
-          style={{ fontFamily: "var(--font-dm-sans)" }}
+          style={{ fontFamily: FONT_DM_SANS_VAR }}
         >
           Continue
         </button>
@@ -213,7 +214,7 @@ export default function CancellationSurveyModal({
     <>
       <h2
         className="text-[28px] font-semibold text-gray-800 leading-snug"
-        style={{ fontFamily: "var(--font-dm-sans)" }}
+        style={{ fontFamily: FONT_DM_SANS_VAR }}
       >
         What’s the main reason for cancelling?
       </h2>
@@ -312,14 +313,16 @@ export default function CancellationSurveyModal({
       <div>
         <p
           className="text-[15px] text-gray-700 mb-2"
-          style={{ fontFamily: "var(--font-dm-sans)" }}
+          style={{ fontFamily: FONT_DM_SANS_VAR }}
         >
           {label}
         </p>
         <div
           className={[
             // Figma shows 4 across even on mobile
-            mobile ? "grid grid-cols-4 gap-3" : "grid grid-cols-2 md:grid-cols-4 gap-3",
+            mobile
+              ? "grid grid-cols-4 gap-3"
+              : "grid grid-cols-2 md:grid-cols-4 gap-3",
           ].join(" ")}
         >
           {options.map((val) => (
@@ -363,10 +366,23 @@ export default function CancellationSurveyModal({
                 className="flex items-center gap-2 text-gray-700 hover:text-gray-900"
                 aria-label="Back"
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M15 19l-7-7 7-7"
+                  />
                 </svg>
-                <span className="text-sm" style={{ fontFamily: "var(--font-dm-sans)" }}>
+                <span
+                  className="text-sm"
+                  style={{ fontFamily: FONT_DM_SANS_VAR }}
+                >
                   Back
                 </span>
               </button>
@@ -375,7 +391,7 @@ export default function CancellationSurveyModal({
                 <h3
                   id="survey-title"
                   className="text-base md:text-lg font-semibold text-gray-900"
-                  style={{ fontFamily: "var(--font-dm-sans)" }}
+                  style={{ fontFamily: FONT_DM_SANS_VAR }}
                 >
                   Subscription Cancellation
                 </h3>
@@ -387,8 +403,18 @@ export default function CancellationSurveyModal({
                 className="p-1.5 text-gray-400 hover:text-gray-600"
                 aria-label="Close"
               >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                <svg
+                  className="w-6 h-6"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
                 </svg>
               </button>
             </div>
@@ -406,7 +432,7 @@ export default function CancellationSurveyModal({
                     fill
                     className="object-cover"
                     priority
-                    sizes="(min-width:1024px) 560px, 100vw"
+                    sizes={`(min-width:${DESKTOP_MIN_WIDTH_PX}px) 560px, 100vw`}
                   />
                 </div>
               </div>
@@ -430,12 +456,14 @@ export default function CancellationSurveyModal({
               <button
                 onClick={handleAcceptOffer}
                 className="w-full h-[56px] rounded-2xl font-semibold text-white bg-[#28B463] hover:bg-[#24A259] transition-colors flex items-center justify-center gap-2"
-                style={{ fontFamily: "var(--font-dm-sans)" }}
+                style={{ fontFamily: FONT_DM_SANS_VAR }}
               >
                 <span>Get 50% off</span>
                 <span className="text-lg">|</span>
                 <span className="text-lg font-bold">$12.50</span>
-                <span className="text-sm line-through text-green-200 ml-1">$25</span>
+                <span className="text-sm line-through text-green-200 ml-1">
+                  $25
+                </span>
               </button>
               <button
                 onClick={handleContinue}
@@ -446,7 +474,7 @@ export default function CancellationSurveyModal({
                     ? "bg-red-500 text-white hover:bg-red-600"
                     : "bg-gray-100 text-gray-400 border border-gray-200 cursor-not-allowed",
                 ].join(" ")}
-                style={{ fontFamily: "var(--font-dm-sans)" }}
+                style={{ fontFamily: FONT_DM_SANS_VAR }}
               >
                 Continue
               </button>
@@ -459,3 +487,5 @@ export default function CancellationSurveyModal({
     </>
   );
 }
+
+export default React.memo(CancellationSurveyModal);

@@ -5,6 +5,7 @@ import Image from "next/image";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import ResponsiveDialog from "./ResponsiveDialog";
 import MUIDrawer from "./MUIDrawer";
+import { DESKTOP_MIN_WIDTH_PX, FONT_DM_SANS_VAR } from "../lib/ui/constants";
 
 type Props = {
   visible: boolean;
@@ -12,12 +13,8 @@ type Props = {
   totalSteps?: number; // default 3
 };
 
-export default function CancellationFinalModal({
-  visible,
-  onClose,
-  totalSteps = 3,
-}: Props) {
-  const isDesktop = useMediaQuery("(min-width:1024px)");
+function CancellationFinalModal({ visible, onClose, totalSteps = 3 }: Props) {
+  const isDesktop = useMediaQuery(`(min-width:${DESKTOP_MIN_WIDTH_PX}px)`);
 
   if (!visible) return null;
 
@@ -31,7 +28,7 @@ export default function CancellationFinalModal({
       </div>
       <span
         className="text-sm text-gray-600"
-        style={{ fontFamily: "var(--font-dm-sans)" }}
+        style={{ fontFamily: FONT_DM_SANS_VAR }}
       >
         Completed
       </span>
@@ -43,14 +40,14 @@ export default function CancellationFinalModal({
     <>
       <h1
         className="text-4xl font-semibold text-gray-800 leading-tight"
-        style={{ fontFamily: "var(--font-dm-sans)" }}
+        style={{ fontFamily: FONT_DM_SANS_VAR }}
       >
         Sorry to see you go, mate.
       </h1>
 
       <h2
         className="text-base md:text-[17px] font-semibold text-gray-800 leading-relaxed mt-4"
-        style={{ fontFamily: "var(--font-dm-sans)" }}
+        style={{ fontFamily: FONT_DM_SANS_VAR }}
       >
         Thanks for being with us, and you&apos;re always welcome back.
       </h2>
@@ -58,7 +55,7 @@ export default function CancellationFinalModal({
       <div className="mt-6 space-y-3">
         <p
           className="text-[15px] text-gray-700 leading-relaxed"
-          style={{ fontFamily: "var(--font-dm-sans)" }}
+          style={{ fontFamily: FONT_DM_SANS_VAR }}
         >
           Your subscription is set to end on XX date.
           <br />
@@ -68,7 +65,7 @@ export default function CancellationFinalModal({
 
         <p
           className="text-[15px] text-gray-600 leading-relaxed"
-          style={{ fontFamily: "var(--font-dm-sans)" }}
+          style={{ fontFamily: FONT_DM_SANS_VAR }}
         >
           Changed your mind? You can reactivate anytime before your end date.
         </p>
@@ -77,7 +74,7 @@ export default function CancellationFinalModal({
       <button
         onClick={onClose}
         className="w-full max-w-[560px] py-4 rounded-2xl font-semibold bg-[#5D3AF7] text-white hover:bg-[#4F2FF3] transition-colors mt-6"
-        style={{ fontFamily: "var(--font-dm-sans)" }}
+        style={{ fontFamily: FONT_DM_SANS_VAR }}
       >
         Back to Jobs
       </button>
@@ -104,14 +101,14 @@ export default function CancellationFinalModal({
       {/* Headings + copy */}
       <h1
         className="text-[32px] font-semibold text-gray-800 leading-[1.15] mt-5"
-        style={{ fontFamily: "var(--font-dm-sans)" }}
+        style={{ fontFamily: FONT_DM_SANS_VAR }}
       >
         Sorry to see you go, mate.
       </h1>
 
       <h2
         className="text-[18px] font-semibold text-gray-800 leading-relaxed mt-3"
-        style={{ fontFamily: "var(--font-dm-sans)" }}
+        style={{ fontFamily: FONT_DM_SANS_VAR }}
       >
         Thanks for being with us, and you’re always welcome back.
       </h2>
@@ -119,7 +116,7 @@ export default function CancellationFinalModal({
       <div className="mt-5 space-y-3">
         <p
           className="text-[15px] text-gray-700 leading-relaxed"
-          style={{ fontFamily: "var(--font-dm-sans)" }}
+          style={{ fontFamily: FONT_DM_SANS_VAR }}
         >
           Your subscription is set to end on XX date. You’ll still have full
           access until then. No further charges after that.
@@ -127,7 +124,7 @@ export default function CancellationFinalModal({
 
         <p
           className="text-[15px] text-gray-600 leading-relaxed"
-          style={{ fontFamily: "var(--font-dm-sans)" }}
+          style={{ fontFamily: FONT_DM_SANS_VAR }}
         >
           Changed your mind? You can reactivate anytime before your end date.
         </p>
@@ -177,7 +174,7 @@ export default function CancellationFinalModal({
                   </svg>
                   <span
                     className="text-sm"
-                    style={{ fontFamily: "var(--font-dm-sans)" }}
+                    style={{ fontFamily: FONT_DM_SANS_VAR }}
                   >
                     Back
                   </span>
@@ -187,7 +184,7 @@ export default function CancellationFinalModal({
                   <h3
                     id="final-completion-title"
                     className="text-base md:text-lg font-semibold text-gray-900"
-                    style={{ fontFamily: "var(--font-dm-sans)" }}
+                    style={{ fontFamily: FONT_DM_SANS_VAR }}
                   >
                     Subscription Cancelled
                   </h3>
@@ -231,7 +228,7 @@ export default function CancellationFinalModal({
                     fill
                     className="object-cover"
                     priority
-                    sizes="(min-width:1024px) 560px, 100vw"
+                    sizes={`(min-width:${DESKTOP_MIN_WIDTH_PX}px) 560px, 100vw`}
                   />
                 </div>
               </div>
@@ -254,7 +251,7 @@ export default function CancellationFinalModal({
             <button
               onClick={onClose}
               className="w-full h-[56px] rounded-2xl font-semibold bg-[#5D3AF7] text-white hover:bg-[#4F2FF3] transition-colors"
-              style={{ fontFamily: "var(--font-dm-sans)" }}
+              style={{ fontFamily: FONT_DM_SANS_VAR }}
             >
               Back to Jobs
             </button>
@@ -266,3 +263,5 @@ export default function CancellationFinalModal({
     </>
   );
 }
+
+export default React.memo(CancellationFinalModal);

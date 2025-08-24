@@ -3,6 +3,12 @@
 import React from "react";
 import Image from "next/image";
 import useMediaQuery from "@mui/material/useMediaQuery";
+import {
+  DESKTOP_MIN_WIDTH_PX,
+  FONT_DM_SANS_VAR,
+  BACKDROP_RGBA,
+  BACKDROP_BLUR,
+} from "../lib/ui/constants";
 import IconButton from "@mui/material/IconButton";
 import CloseIcon from "@mui/icons-material/Close";
 import ResponsiveDialog from "./ResponsiveDialog";
@@ -21,8 +27,8 @@ export default function CancellationModal({
   onJobFound,
   onStillLooking,
 }: Props) {
-  // Tailwind-aligned breakpoint: desktop >= 1024px
-  const isDesktop = useMediaQuery("(min-width:1024px)");
+  // Tailwind-aligned breakpoint: desktop >= DESKTOP_MIN_WIDTH_PX
+  const isDesktop = useMediaQuery(`(min-width:${DESKTOP_MIN_WIDTH_PX}px)`);
 
   if (!visible) return null;
 
@@ -35,11 +41,11 @@ export default function CancellationModal({
           role="dialog"
           aria-modal="true"
           aria-labelledby="cancel-title"
-           style={{
-    backgroundColor: "rgba(255,255,255,0.55)",       
-    backdropFilter: "blur(50px) brightness(0.9)",    
-    WebkitBackdropFilter: "blur(50px) brightness(0.9)"
-  }}
+          style={{
+            backgroundColor: BACKDROP_RGBA,
+            backdropFilter: BACKDROP_BLUR,
+            WebkitBackdropFilter: BACKDROP_BLUR,
+          }}
           onClick={(e) => {
             if (e.target === e.currentTarget) onClose();
           }}
@@ -62,7 +68,7 @@ export default function CancellationModal({
                 <h3
                   id="cancel-title"
                   className="text-lg font-semibold text-gray-900 flex justify-center"
-                  style={{ fontFamily: "var(--font-dm-sans)", margin: 0 }}
+                  style={{ fontFamily: FONT_DM_SANS_VAR, margin: 0 }}
                 >
                   Subscription Cancellation
                 </h3>
@@ -88,7 +94,7 @@ export default function CancellationModal({
                 <div className="max-w-[1000px]">
                   <h1
                     className="text-4xl md:text-4xl font-semibold text-gray-800 leading-tight -mt-4"
-                    style={{ fontFamily: "var(--font-dm-sans)" }}
+                    style={{ fontFamily: FONT_DM_SANS_VAR }}
                   >
                     Hey mate,
                     <br />
@@ -97,14 +103,14 @@ export default function CancellationModal({
 
                   <p
                     className="text-4xl md:text-4xl font-semibold text-gray-800 mt-4"
-                    style={{ fontFamily: "var(--font-dm-sans)" }}
+                    style={{ fontFamily: FONT_DM_SANS_VAR }}
                   >
                     <em>Have you found a job yet?</em>
                   </p>
 
                   <p
                     className="text-gray-700 text-base md:text-[16px] leading-relaxed mt-4"
-                    style={{ fontFamily: "var(--font-dm-sans)" }}
+                    style={{ fontFamily: FONT_DM_SANS_VAR }}
                   >
                     Whatever your answer, we just want to help you take the next
                     step. With visa support, or by hearing how we can do better.
@@ -116,7 +122,7 @@ export default function CancellationModal({
                     <button
                       onClick={onJobFound}
                       className="w-full max-w-[560px] py-4 rounded-2xl border border-gray-300 bg-white shadow-sm hover:shadow-md hover:border-gray-400 transition-all text-gray-800 font-semibold focus:outline-none focus:ring-2 focus:ring-gray-300"
-                      style={{ fontFamily: "var(--font-dm-sans)" }}
+                      style={{ fontFamily: FONT_DM_SANS_VAR }}
                     >
                       Yes, I&apos;ve found a job
                     </button>
@@ -124,7 +130,7 @@ export default function CancellationModal({
                     <button
                       onClick={onStillLooking}
                       className="w-full max-w-[560px] py-4 rounded-2xl border border-gray-300 bg-white shadow-sm hover:shadow-md hover:border-gray-400 transition-all text-gray-800 font-semibold focus:outline-none focus:ring-2 focus:ring-gray-300"
-                      style={{ fontFamily: "var(--font-dm-sans)" }}
+                      style={{ fontFamily: FONT_DM_SANS_VAR }}
                     >
                       Not yet – I&apos;m still looking
                     </button>
@@ -175,7 +181,7 @@ export default function CancellationModal({
           {/* Copy */}
           <h1
             className="mt-5 text-[32px] leading-[1.12] font-semibold text-gray-800 tracking-[-0.01em]"
-            style={{ fontFamily: "var(--font-dm-sans)" }}
+            style={{ fontFamily: FONT_DM_SANS_VAR }}
           >
             Hey mate,
             <br />
@@ -184,14 +190,14 @@ export default function CancellationModal({
 
           <p
             className="mt-3 text-[28px] leading-[1.1] font-semibold italic text-gray-800 tracking-[-0.01em]"
-            style={{ fontFamily: "var(--font-dm-sans)" }}
+            style={{ fontFamily: FONT_DM_SANS_VAR }}
           >
             Have you found a job yet?
           </p>
 
           <p
             className="mt-3 text-[16px] leading-[1.6] text-gray-600"
-            style={{ fontFamily: "var(--font-dm-sans)" }}
+            style={{ fontFamily: FONT_DM_SANS_VAR }}
           >
             Whatever your answer, we just want to help you take the next step.
             With visa support, or by hearing how we can do better.
@@ -204,7 +210,7 @@ export default function CancellationModal({
             <button
               onClick={onJobFound}
               className="w-full h-[56px] rounded-2xl border border-gray-300 bg-white shadow-sm hover:shadow-md hover:border-gray-400 transition-all text-gray-800 font-semibold text-[18px]"
-              style={{ fontFamily: "var(--font-dm-sans)" }}
+              style={{ fontFamily: FONT_DM_SANS_VAR }}
             >
               Yes, I&apos;ve found a job
             </button>
@@ -212,7 +218,7 @@ export default function CancellationModal({
             <button
               onClick={onStillLooking}
               className="w-full h-[56px] rounded-2xl border border-gray-300 bg-white shadow-sm hover:shadow-md hover:border-gray-400 transition-all text-gray-800 font-semibold text-[18px]"
-              style={{ fontFamily: "var(--font-dm-sans)" }}
+              style={{ fontFamily: FONT_DM_SANS_VAR }}
             >
               Not yet – I&apos;m still looking
             </button>
