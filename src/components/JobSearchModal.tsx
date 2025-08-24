@@ -11,10 +11,10 @@ type Props = {
   visible: boolean;
   onClose: () => void;
   onBack?: () => void;
-  onAccept: () => void; // CTA: Get 50% off
-  onDecline: () => void; // Ghost: No thanks (after survey flow)
-  step?: number; // defaults 1
-  totalSteps?: number; // defaults 3
+  onAccept: () => void; 
+  onDecline: () => void; 
+  step?: number; 
+  totalSteps?: number; 
 };
 
 export default function JobSearchModal({

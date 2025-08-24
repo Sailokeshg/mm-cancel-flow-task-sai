@@ -183,7 +183,6 @@ export default function CancellationCompletionModal({
         </div>
       )}
 
-      {/* MOBILE/TABLET: always render the Drawer; on desktop it's not visible because isDesktop renders dialog instead */}
       {!isDesktop && (
         <MUIDrawer
           open={visible}

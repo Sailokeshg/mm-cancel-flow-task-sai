@@ -15,7 +15,7 @@ type Props = {
   actions?: React.ReactNode;
   maxWidth?: false | "xs" | "sm" | "md" | "lg" | "xl";
   fullWidth?: boolean;
-  paperSx?: any;
+  paperSx?: Record<string, unknown> | undefined;
   /** If true, don't render at all below 1024px (prevents portal on mobile). */
   desktopOnly?: boolean;
 };
